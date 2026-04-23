@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -67,5 +68,19 @@ public class PlayerMovement : MonoBehaviour
         Quaternion targetRotation = Quaternion.Euler(0, 0, angle);
 
         transform.rotation = Quaternion.Lerp(transform.rotation, targetRotation, rotationSpeed * Time.deltaTime);
+    }
+
+    public void PlayerTeleported()
+    {
+        StartCoroutine(DisableCollider());
+    }
+
+    private IEnumerator DisableCollider()
+    {
+        GetComponent<Collider2D>().enabled = false;
+
+        yield return new WaitForSeconds(1);
+
+        GetComponent<Collider2D>().enabled = true;
     }
 }
