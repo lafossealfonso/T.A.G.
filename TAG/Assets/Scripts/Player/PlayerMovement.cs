@@ -7,6 +7,8 @@ public class PlayerMovement : MonoBehaviour
 {
     [Header("Movement")]
     [SerializeField] private float moveSpeed;
+    [SerializeField] private float boostForce;
+    [SerializeField] private bool isBoosting = false;
 
     [Header("Rotation")]
     [SerializeField] private float rotationSpeed;
@@ -51,7 +53,10 @@ public class PlayerMovement : MonoBehaviour
 
     private void Move()
     {
-        rb.linearVelocity = moveInput * moveSpeed;
+        rb.linearVelocity = new Vector2(
+            moveInput.x * moveSpeed,
+            moveInput.y * moveSpeed
+        ) + rb.linearVelocity * 0.9f;
     }
 
     private void RotateDirection()
@@ -82,5 +87,11 @@ public class PlayerMovement : MonoBehaviour
         yield return new WaitForSeconds(1);
 
         GetComponent<Collider2D>().enabled = true;
+    }
+
+    public void BoostPad()
+    {
+        Vector2 direction = moveInput;
+        rb.AddForce(direction.normalized * boostForce, ForceMode2D.Impulse);
     }
 }
