@@ -8,7 +8,8 @@ public class PlayerMovement : MonoBehaviour
     [Header("Movement")]
     [SerializeField] private float moveSpeed;
     [SerializeField] private float boostForce;
-    [SerializeField] private bool isBoosting = false;
+    [SerializeField] private float slowDuration;
+    [SerializeField] private float slowMultiplier;
 
     [Header("Rotation")]
     [SerializeField] private float rotationSpeed;
@@ -75,6 +76,7 @@ public class PlayerMovement : MonoBehaviour
         transform.rotation = Quaternion.Lerp(transform.rotation, targetRotation, rotationSpeed * Time.deltaTime);
     }
 
+    //-----------------------------------------------
     public void PlayerTeleported()
     {
         StartCoroutine(DisableCollider());
@@ -88,10 +90,25 @@ public class PlayerMovement : MonoBehaviour
 
         GetComponent<Collider2D>().enabled = true;
     }
-
+    //-----------------------------------------------
     public void BoostPad()
     {
         Vector2 direction = moveInput;
         rb.AddForce(direction.normalized * boostForce, ForceMode2D.Impulse);
     }
+    //-----------------------------------------------
+    public void SlowPad()
+    {
+        StartCoroutine(SlowMovement());
+    }
+
+    private IEnumerator SlowMovement()
+    {
+        moveSpeed = moveSpeed * slowMultiplier;
+
+        yield return new WaitForSeconds(slowDuration);
+
+        moveSpeed = moveSpeed / slowMultiplier;
+    }
+    //-----------------------------------------------
 }
