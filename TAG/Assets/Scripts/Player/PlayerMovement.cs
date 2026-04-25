@@ -17,6 +17,8 @@ public class PlayerMovement : MonoBehaviour
     private Rigidbody2D rb;
     private Vector2 moveInput;
 
+    public bool canMove = false;
+
     //me when I begin the day
     private void Awake()
     {
@@ -26,6 +28,8 @@ public class PlayerMovement : MonoBehaviour
     //me when the player moves
     public void OnMove(InputValue value)
     {
+        if (!canMove)
+            return;
         Vector2 input = value.Get<Vector2>();
 
         //me when i go horizontal
