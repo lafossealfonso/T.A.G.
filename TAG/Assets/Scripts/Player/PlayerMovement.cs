@@ -32,18 +32,16 @@ public class PlayerMovement : MonoBehaviour
             return;
         Vector2 input = value.Get<Vector2>();
 
-        //me when i go horizontal
         if(Mathf.Abs(input.x) > Mathf.Abs(input.y))
         {
             moveInput = new Vector2(Mathf.Sign(input.x), 0);
         }
 
-        //me when i go up
         else if(Mathf.Abs(input.y) > 0)
         {
             moveInput = new Vector2(0, Mathf.Sign(input.y));
         }
-        //me when i dont go
+        
         else
         {
             moveInput = Vector2.zero;
@@ -115,4 +113,12 @@ public class PlayerMovement : MonoBehaviour
         moveSpeed = moveSpeed / slowMultiplier;
     }
     //-----------------------------------------------
+
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        if (collision.gameObject.CompareTag("Player"))
+        {
+            GameManager.Instance.PlayerTagged(this.gameObject, collision.transform.parent.gameObject);
+        }
+    }
 }

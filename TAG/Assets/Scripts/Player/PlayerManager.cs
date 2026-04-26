@@ -12,11 +12,14 @@ public class PlayerManager : MonoBehaviour
     [SerializeField] private List<PlayerMenuCard> playerMenuItems;
     [SerializeField] private GameObject menuParent;
     [SerializeField] private List<PlayerInput> players;
+    [SerializeField] public List<Basic_PlayerScoreCard> scoreCards;
+    [SerializeField] List<GameObject> joinedPlayers = new List<GameObject>();
 
     private void OnPlayerJoined(PlayerInput player)
     {
         targetGroup.AddMember(player.gameObject.transform, 0.5f, 1);
         players.Add(player);
+        RegisterPlayer(player.gameObject);
         player.transform.position = spawnPoints[players.IndexOf(player)].position;
         playerMenuItems[players.IndexOf(player)].menuText.text = "Ready";
     }
@@ -34,5 +37,17 @@ public class PlayerManager : MonoBehaviour
         }
         menuParent.SetActive(false);
         playerInputManager.DisableJoining();
+    }
+
+    public void RegisterPlayer(GameObject player)
+    {
+        joinedPlayers.Add(player);
+
+        int index = joinedPlayers.Count - 1;
+
+        if(index < scoreCards.Count)
+        {
+            scoreCards[index].AssignPlayer(player);
+        }
     }
 }
