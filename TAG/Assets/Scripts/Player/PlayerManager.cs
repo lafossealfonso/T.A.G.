@@ -2,6 +2,7 @@ using Unity.Cinemachine;
 using UnityEngine.InputSystem;
 using UnityEngine;
 using System.Collections.Generic;
+using TMPro;
 
 
 public class PlayerManager : MonoBehaviour
@@ -14,14 +15,20 @@ public class PlayerManager : MonoBehaviour
     [SerializeField] private List<PlayerInput> players;
     [SerializeField] public List<Basic_PlayerScoreCard> scoreCards;
     [SerializeField] List<GameObject> joinedPlayers = new List<GameObject>();
+    [SerializeField] List<Color> playerColors;
 
     private void OnPlayerJoined(PlayerInput player)
     {
         targetGroup.AddMember(player.gameObject.transform, 0.5f, 1);
         players.Add(player);
-        RegisterPlayer(player.gameObject);
+        Color playerColor = playerColors[players.IndexOf(player)];
+        RegisterPlayer(player.gameObject, playerColor);
+        player.gameObject.GetComponent<PlayerMovement>().SetPlayerVisualColour(playerColor);
         player.transform.position = spawnPoints[players.IndexOf(player)].position;
         playerMenuItems[players.IndexOf(player)].menuText.text = "Ready";
+        playerMenuItems[players.IndexOf(player)].menuText.fontStyle = (FontStyles)FontStyle.Bold;
+        playerMenuItems[players.IndexOf(player)].menuText.color = playerColor;
+
     }
     private void OnPlayerLeft(PlayerInput player)
     {
@@ -39,7 +46,7 @@ public class PlayerManager : MonoBehaviour
         playerInputManager.DisableJoining();
     }
 
-    public void RegisterPlayer(GameObject player)
+    public void RegisterPlayer(GameObject player, Color playerColor)
     {
         joinedPlayers.Add(player);
 
@@ -47,7 +54,7 @@ public class PlayerManager : MonoBehaviour
 
         if(index < scoreCards.Count)
         {
-            scoreCards[index].AssignPlayer(player);
+            scoreCards[index].AssignPlayer(player, playerColor);
         }
     }
 }

@@ -4,4 +4,5 @@ using TMPro;
 public class PlayerMenuCard : MonoBehaviour
 {
     public TextMeshProUGUI menuText;
+
 }

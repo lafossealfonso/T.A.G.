@@ -18,11 +18,20 @@ public class PlayerMovement : MonoBehaviour
     private Vector2 moveInput;
 
     public bool canMove = false;
+    public bool isIt = false;
+
+    public SpriteRenderer playerVisual;
+    public GameObject itIndicator;
 
     //me when I begin the day
     private void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
+    }
+
+    public void SetPlayerVisualColour(Color color)
+    {
+        playerVisual.color = color;
     }
 
     //me when the player moves
@@ -114,11 +123,67 @@ public class PlayerMovement : MonoBehaviour
     }
     //-----------------------------------------------
 
-    private void OnTriggerEnter2D(Collider2D collision)
+    private bool canTag = true;
+
+    private void OnCollisionEnter2D(Collision2D collision)
     {
+        if (!canTag) return;
+
         if (collision.gameObject.CompareTag("Player"))
         {
-            GameManager.Instance.PlayerTagged(this.gameObject, collision.transform.parent.gameObject);
+            PlayerMovement otherPlayer =
+                collision.gameObject.GetComponent<PlayerMovement>();
+
+            if (otherPlayer != null &&
+                otherPlayer.returnIsIt() &&
+                !isIt)
+            {
+                canTag = false;
+                otherPlayer.canTag = false;
+
+                Debug.Log("Tag successful");
+
+                // old It loses It
+                otherPlayer.setIsIt(false);
+
+                // this player becomes new It
+                GameManager.Instance.PlayerTagged(
+                    this.gameObject,
+                    collision.gameObject
+                );
+
+                Invoke(nameof(ResetTagCooldown), 0.5f);
+                otherPlayer.Invoke(nameof(ResetTagCooldown), 0.5f);
+            }
         }
     }
+
+    void ResetTagCooldown()
+    {
+        canTag = true;
+    }
+
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        if (collision.gameObject.CompareTag("Star"))
+        {
+            setIsIt(true);
+            Destroy(collision.gameObject);
+            Debug.Log("isit");
+        }
+    }
+
+
+    //-----------------------------------------------
+    public void setIsIt(bool isIt)
+    {
+        this.isIt = isIt;
+        itIndicator.SetActive(isIt);
+    }
+
+    public bool returnIsIt()
+    {
+        return isIt;
+    }
+    //-----------------------------------------------
 }

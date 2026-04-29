@@ -5,6 +5,7 @@ TagManager:
   serializedVersion: 3
   tags:
   - WeakSpot
+  - Star
   layers:
   - Default
   - TransparentFX

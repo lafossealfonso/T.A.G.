@@ -7,15 +7,15 @@ public class Basic_PlayerScoreCard : MonoBehaviour
     [SerializeField] TextMeshProUGUI PlayerName;
     [SerializeField] TextMeshProUGUI PlayerCounterText;
     [SerializeField] int scoreCounter;
-
     private GameObject assignedPlayer;
 
-    public void AssignPlayer(GameObject player)
+    public void AssignPlayer(GameObject player, Color color)
     {
         assignedPlayer = player;
         PlayerName.text = "Player";
         scoreCounter = 0;
         UpdateUI();
+        SetUIColor(color);
     }
 
     public bool IsAssignedTo(GameObject player)
@@ -31,6 +31,12 @@ public class Basic_PlayerScoreCard : MonoBehaviour
     private void UpdateUI()
     {
         PlayerCounterText.text = scoreCounter.ToString();
+    }
+
+    public void SetUIColor(Color color)
+    {
+        PlayerName.color = color;
+        PlayerCounterText.color = color;
     }
 
 }

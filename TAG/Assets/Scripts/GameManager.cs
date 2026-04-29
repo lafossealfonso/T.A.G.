@@ -27,6 +27,6 @@ public class GameManager : MonoBehaviour
     {
         Debug.Log(taggedPlayer.name + "was Tagged");
 
-        OnPlayerTagged?.Invoke(taggingPlayer, taggedPlayer);
+        OnPlayerTagged?.Invoke(taggingPlayer,taggedPlayer);
     }
 }

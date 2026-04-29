@@ -15,7 +15,7 @@ public class Portal : MonoBehaviour
         if (other.gameObject.CompareTag("Player"))
         {
             int randomIndex = Random.Range(0, linkedPortals.Count);
-            other.transform.parent.gameObject.transform.position = linkedPortals[randomIndex].position;
+            other.transform.position = linkedPortals[randomIndex].position;
             PlayerMovement playerMovement = other.GetComponent<PlayerMovement>();
             playerMovement.PlayerTeleported();
         }

@@ -18,6 +18,7 @@ public class BasicGameMode : MonoBehaviour
 
     void HandlePlayerTagged(GameObject taggingPlayer, GameObject taggedPlayer)
     {
+        taggingPlayer.GetComponent<PlayerMovement>().setIsIt(true);
         taggedPlayer.transform.position = spawnPoints[Random.Range(0, spawnPoints.Count)].position;
 
         foreach (Basic_PlayerScoreCard card in playerManager.scoreCards)
