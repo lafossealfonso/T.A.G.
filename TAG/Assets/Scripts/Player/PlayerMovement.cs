@@ -5,6 +5,7 @@ using UnityEngine.InputSystem;
 [RequireComponent(typeof(Rigidbody2D))]
 public class PlayerMovement : MonoBehaviour
 {
+    
     [Header("Movement")]
     [SerializeField] private float moveSpeed;
     [SerializeField] private float boostForce;
@@ -22,6 +23,8 @@ public class PlayerMovement : MonoBehaviour
 
     public SpriteRenderer playerVisual;
     public GameObject itIndicator;
+
+    public Basic_PlayerScoreCard thisPlayerScoreCard;
 
     //me when I begin the day
     private void Awake()
@@ -167,8 +170,10 @@ public class PlayerMovement : MonoBehaviour
     {
         if (collision.gameObject.CompareTag("Star"))
         {
-            setIsIt(true);
             Destroy(collision.gameObject);
+            //GameManager.Instance.RemoveFromCinemachineTargetGroup(collision.gameObject.transform);
+            setIsIt(true);
+            
             Debug.Log("isit");
         }
     }

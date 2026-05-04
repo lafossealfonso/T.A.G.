@@ -7,6 +7,7 @@ using TMPro;
 
 public class PlayerManager : MonoBehaviour
 {
+    public static PlayerManager Instance;
     [SerializeField] private CinemachineTargetGroup targetGroup;
     [SerializeField] private PlayerInputManager playerInputManager;
     [SerializeField] private List<Transform> spawnPoints;
@@ -16,13 +17,24 @@ public class PlayerManager : MonoBehaviour
     [SerializeField] public List<Basic_PlayerScoreCard> scoreCards;
     [SerializeField] List<GameObject> joinedPlayers = new List<GameObject>();
     [SerializeField] List<Color> playerColors;
+    [SerializeField] List<string> playerNames;
 
+    private void Awake()
+    {
+        if (Instance == null)
+        {
+            Instance = this;
+        }
+
+        else { Destroy(gameObject); }
+    }
     private void OnPlayerJoined(PlayerInput player)
     {
         targetGroup.AddMember(player.gameObject.transform, 0.5f, 1);
         players.Add(player);
         Color playerColor = playerColors[players.IndexOf(player)];
-        RegisterPlayer(player.gameObject, playerColor);
+        string playerName = playerNames[players.IndexOf(player)];
+        RegisterPlayer(player.gameObject, playerColor, playerName);
         player.gameObject.GetComponent<PlayerMovement>().SetPlayerVisualColour(playerColor);
         player.transform.position = spawnPoints[players.IndexOf(player)].position;
         playerMenuItems[players.IndexOf(player)].menuText.text = "Ready";
@@ -46,7 +58,7 @@ public class PlayerManager : MonoBehaviour
         playerInputManager.DisableJoining();
     }
 
-    public void RegisterPlayer(GameObject player, Color playerColor)
+    public void RegisterPlayer(GameObject player, Color playerColor, string playerName)
     {
         joinedPlayers.Add(player);
 
@@ -54,7 +66,15 @@ public class PlayerManager : MonoBehaviour
 
         if(index < scoreCards.Count)
         {
-            scoreCards[index].AssignPlayer(player, playerColor);
+            scoreCards[index].AssignPlayer(player, playerColor, playerName);
+        }
+    }
+
+    public void DisablePlayerMovement()
+    {
+        foreach (PlayerInput player in players)
+        {
+            player.GetComponent<PlayerMovement>().canMove = false;
         }
     }
 }

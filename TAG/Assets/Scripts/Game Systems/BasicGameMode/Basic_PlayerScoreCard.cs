@@ -1,22 +1,72 @@
 using TMPro;
 using UnityEngine;
 using UnityEngine.SocialPlatforms.Impl;
+using UnityEngine.UI;
 
 public class Basic_PlayerScoreCard : MonoBehaviour
 {
     [SerializeField] TextMeshProUGUI PlayerName;
-    [SerializeField] TextMeshProUGUI PlayerCounterText;
-    [SerializeField] int scoreCounter;
+    [SerializeField] Slider scoreSlider;
+    [SerializeField] Image fillSlideRenderer;
+    [SerializeField] public float fillSpeed;
     private GameObject assignedPlayer;
+    private PlayerMovement playerMovementScript;
+    bool playerIsAssigned = false;
+    public string playerName;
+    public Color playerColor;
 
-    public void AssignPlayer(GameObject player, Color color)
+
+    public void AssignPlayer(GameObject player, Color color, string name)
     {
+        PlayerName.gameObject.SetActive(true);
+        scoreSlider.gameObject.SetActive(true);
+        scoreSlider.value = 0;
+        //PlayerCounterText.gameObject.SetActive(true);
         assignedPlayer = player;
-        PlayerName.text = "Player";
-        scoreCounter = 0;
-        UpdateUI();
+        //scoreCounter = 0;
         SetUIColor(color);
+        playerColor = color;
+        playerMovementScript = assignedPlayer.gameObject.GetComponent<PlayerMovement>();
+        playerMovementScript.thisPlayerScoreCard = this;
+        playerIsAssigned = true;
+        playerName = name;
+        PlayerName.text = name;
+        UpdateUI();
     }
+
+    private void Start()
+    {
+        PlayerName.gameObject.SetActive(false);
+        scoreSlider.gameObject.SetActive(false);
+    }
+
+    private void Update()
+    {
+
+        if (playerIsAssigned)
+        {
+            if (playerMovementScript.isIt)
+            {
+                scoreSlider.value += fillSpeed * Time.deltaTime;
+
+                if (scoreSlider.value >= scoreSlider.maxValue)
+                {
+                    GameManager.Instance.WinnerEvent(assignedPlayer);
+                }
+            }
+
+            else if (playerMovementScript.isIt == false)
+            {
+                scoreSlider.value -= fillSpeed * 0.3f * Time.deltaTime;
+
+                
+
+            }
+        }
+        
+    }
+
+
 
     public bool IsAssignedTo(GameObject player)
     {
@@ -25,18 +75,19 @@ public class Basic_PlayerScoreCard : MonoBehaviour
 
     public void AddScore(int amount)
     {
-        scoreCounter += amount;
+        //scoreCounter += amount;
         UpdateUI();
     }
     private void UpdateUI()
     {
-        PlayerCounterText.text = scoreCounter.ToString();
+        //PlayerCounterText.text = scoreCounter.ToString();
     }
 
     public void SetUIColor(Color color)
     {
         PlayerName.color = color;
-        PlayerCounterText.color = color;
+        fillSlideRenderer.color = color;
+        //PlayerCounterText.color = color;
     }
 
 }
