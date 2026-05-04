@@ -22,7 +22,9 @@ public class PlayerMovement : MonoBehaviour
     public bool isIt = false;
 
     public SpriteRenderer playerVisual;
+    public SpriteRenderer directionIndicator;
     public GameObject itIndicator;
+    public TrailRenderer trail;
 
     public Basic_PlayerScoreCard thisPlayerScoreCard;
 
@@ -35,6 +37,23 @@ public class PlayerMovement : MonoBehaviour
     public void SetPlayerVisualColour(Color color)
     {
         playerVisual.color = color;
+        directionIndicator.color = Color.Lerp(color, Color.white, 0.6f);
+        Gradient gradient = new Gradient();
+
+        gradient.SetKeys(
+    new GradientColorKey[]
+    {
+        new GradientColorKey(color, 0.0f),
+        new GradientColorKey(color, 1.0f)
+    },
+    new GradientAlphaKey[]
+    {
+        new GradientAlphaKey(0.6f, 0.0f), // fully visible at start
+        new GradientAlphaKey(0.6f, 0.4f), // fully visible at start
+        new GradientAlphaKey(0.0f, 1.0f)  // fully transparent at end
+    }
+);
+        trail.colorGradient = gradient;
     }
 
     //me when the player moves

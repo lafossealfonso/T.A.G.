@@ -6,18 +6,19 @@ public class Portal : MonoBehaviour
 {
 
     public List<Transform> linkedPortals;
+    public float teleportOffset;
 
     private void OnTriggerEnter2D(Collider2D other)
     {
+        int randomIndex = Random.Range(0, linkedPortals.Count);
+        Transform targetTransform = linkedPortals[randomIndex];
 
-        
+        Rigidbody2D rb = other.GetComponent<Rigidbody2D>();
 
-        if (other.gameObject.CompareTag("Player"))
-        {
-            int randomIndex = Random.Range(0, linkedPortals.Count);
-            other.transform.position = linkedPortals[randomIndex].position;
-            PlayerMovement playerMovement = other.GetComponent<PlayerMovement>();
-            playerMovement.PlayerTeleported();
-        }
+        Vector2 direction = rb.linearVelocity.normalized;
+
+        Vector2 offset = direction * teleportOffset;
+
+        other.transform.position = (Vector2)targetTransform.position + offset;
     }
 }

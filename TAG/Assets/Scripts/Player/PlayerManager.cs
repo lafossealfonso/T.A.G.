@@ -3,6 +3,7 @@ using UnityEngine.InputSystem;
 using UnityEngine;
 using System.Collections.Generic;
 using TMPro;
+using UnityEngine.UI;
 
 
 public class PlayerManager : MonoBehaviour
@@ -18,6 +19,10 @@ public class PlayerManager : MonoBehaviour
     [SerializeField] List<GameObject> joinedPlayers = new List<GameObject>();
     [SerializeField] List<Color> playerColors;
     [SerializeField] List<string> playerNames;
+    public InputAction holdButton;
+    bool hasGameStarted = false;
+    [SerializeField] Slider startSlider;
+    [SerializeField] Image startFillImage;
 
     private void Awake()
     {
@@ -27,6 +32,21 @@ public class PlayerManager : MonoBehaviour
         }
 
         else { Destroy(gameObject); }
+    }
+
+    private void Start()
+    {
+        startSlider.value = 0f;
+    }
+
+    private void OnEnable()
+    {
+        holdButton.Enable();
+    }
+
+    private void OnDisable()
+    {
+        holdButton.Disable();
     }
     private void OnPlayerJoined(PlayerInput player)
     {
@@ -46,7 +66,7 @@ public class PlayerManager : MonoBehaviour
     {
         targetGroup.RemoveMember(player.gameObject.transform);
         players.Remove(player);
-        playerMenuItems[players.IndexOf(player)].menuText.text = "Press Start / Enter\r\nto Join";
+        playerMenuItems[players.IndexOf(player)].menuText.text = "Press X / Enter\r\nto Join";
     }
     public void StartGame()
     {
@@ -75,6 +95,55 @@ public class PlayerManager : MonoBehaviour
         foreach (PlayerInput player in players)
         {
             player.GetComponent<PlayerMovement>().canMove = false;
+        }
+    }
+
+    private void Update()
+    {
+        ColorFillSlider();
+    }
+
+    private void ColorFillSlider()
+    {
+        if (hasGameStarted) return;
+
+        PlayerInput holdingPlayer = null;
+
+        foreach (PlayerInput player in players)
+        {
+            var action = player.actions["Hold"]; // make sure your action is called "Hold"
+
+            if (action != null && action.IsPressed())
+            {
+                holdingPlayer = player;
+                break;
+            }
+        }
+
+        if (holdingPlayer != null)
+        {
+            int index = players.IndexOf(holdingPlayer);
+
+            Color targetColor = playerColors[index];
+
+            // Smoothly transition to the player's colour
+            startFillImage.color = Color.Lerp(
+                startFillImage.color,
+                targetColor,
+                10f * Time.deltaTime
+            );
+
+            startSlider.value += 0.3f * Time.deltaTime;
+
+            if (startSlider.value >= startSlider.maxValue)
+            {
+                StartGame();
+            }
+        }
+        
+        else
+        {
+            startSlider.value -= 0.6f * Time.deltaTime;
         }
     }
 }

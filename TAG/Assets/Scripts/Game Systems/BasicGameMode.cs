@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using TMPro;
 using Unity.Cinemachine;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class BasicGameMode : MonoBehaviour
 {
@@ -41,5 +42,10 @@ public class BasicGameMode : MonoBehaviour
         winnerDisplayName.text = playerCard.playerName;
         winnerDisplayName.color = playerCard.playerColor;
         winnerDisplayName.gameObject.transform.parent.gameObject.SetActive(true);
+    }
+
+    public void Reload()
+    {
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
 }

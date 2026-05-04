@@ -2,6 +2,7 @@ using UnityEngine;
 
 public class BoostPad : MonoBehaviour
 {
+    public float forceAmount;
     private void OnTriggerEnter2D(Collider2D other)
     {
         
@@ -21,7 +22,7 @@ public class BoostPad : MonoBehaviour
 
                 Vector2 moveDirection = rb.linearVelocity.normalized;
 
-                rb.AddForce(moveDirection * 35f, ForceMode2D.Impulse);
+                rb.AddForce(moveDirection * forceAmount, ForceMode2D.Impulse);
             }
         }
 
