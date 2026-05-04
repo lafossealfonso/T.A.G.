@@ -109,6 +109,15 @@ public partial class @Move: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Hold"",
+                    ""type"": ""Button"",
+                    ""id"": ""a33a545d-7c29-4f50-84c8-552b113c60a6"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -276,6 +285,28 @@ public partial class @Move: IInputActionCollection2, IDisposable
                     ""action"": ""StartGame"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""f4891aa0-50ab-4814-b8ee-411ab2e46e8b"",
+                    ""path"": ""<Gamepad>/buttonNorth"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Hold"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""4cbc5998-b68a-4590-82f2-417fec55b0d0"",
+                    ""path"": ""<Keyboard>/space"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Hold"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -286,6 +317,7 @@ public partial class @Move: IInputActionCollection2, IDisposable
         m_PLACEHOLDER = asset.FindActionMap("PLACEHOLDER", throwIfNotFound: true);
         m_PLACEHOLDER_Move = m_PLACEHOLDER.FindAction("Move", throwIfNotFound: true);
         m_PLACEHOLDER_StartGame = m_PLACEHOLDER.FindAction("StartGame", throwIfNotFound: true);
+        m_PLACEHOLDER_Hold = m_PLACEHOLDER.FindAction("Hold", throwIfNotFound: true);
     }
 
     ~@Move()
@@ -368,6 +400,7 @@ public partial class @Move: IInputActionCollection2, IDisposable
     private List<IPLACEHOLDERActions> m_PLACEHOLDERActionsCallbackInterfaces = new List<IPLACEHOLDERActions>();
     private readonly InputAction m_PLACEHOLDER_Move;
     private readonly InputAction m_PLACEHOLDER_StartGame;
+    private readonly InputAction m_PLACEHOLDER_Hold;
     /// <summary>
     /// Provides access to input actions defined in input action map "PLACEHOLDER".
     /// </summary>
@@ -387,6 +420,10 @@ public partial class @Move: IInputActionCollection2, IDisposable
         /// Provides access to the underlying input action "PLACEHOLDER/StartGame".
         /// </summary>
         public InputAction @StartGame => m_Wrapper.m_PLACEHOLDER_StartGame;
+        /// <summary>
+        /// Provides access to the underlying input action "PLACEHOLDER/Hold".
+        /// </summary>
+        public InputAction @Hold => m_Wrapper.m_PLACEHOLDER_Hold;
         /// <summary>
         /// Provides access to the underlying input action map instance.
         /// </summary>
@@ -419,6 +456,9 @@ public partial class @Move: IInputActionCollection2, IDisposable
             @StartGame.started += instance.OnStartGame;
             @StartGame.performed += instance.OnStartGame;
             @StartGame.canceled += instance.OnStartGame;
+            @Hold.started += instance.OnHold;
+            @Hold.performed += instance.OnHold;
+            @Hold.canceled += instance.OnHold;
         }
 
         /// <summary>
@@ -436,6 +476,9 @@ public partial class @Move: IInputActionCollection2, IDisposable
             @StartGame.started -= instance.OnStartGame;
             @StartGame.performed -= instance.OnStartGame;
             @StartGame.canceled -= instance.OnStartGame;
+            @Hold.started -= instance.OnHold;
+            @Hold.performed -= instance.OnHold;
+            @Hold.canceled -= instance.OnHold;
         }
 
         /// <summary>
@@ -490,5 +533,12 @@ public partial class @Move: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnStartGame(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "Hold" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnHold(InputAction.CallbackContext context);
     }
 }

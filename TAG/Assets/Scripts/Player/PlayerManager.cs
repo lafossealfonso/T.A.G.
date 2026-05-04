@@ -23,6 +23,7 @@ public class PlayerManager : MonoBehaviour
     bool hasGameStarted = false;
     [SerializeField] Slider startSlider;
     [SerializeField] Image startFillImage;
+    private PlayerInput lastPlayerToHold;
 
     private void Awake()
     {
@@ -107,40 +108,51 @@ public class PlayerManager : MonoBehaviour
     {
         if (hasGameStarted) return;
 
-        PlayerInput holdingPlayer = null;
+        int holdingCount = 0;
 
         foreach (PlayerInput player in players)
         {
-            var action = player.actions["Hold"]; // make sure your action is called "Hold"
+            var action = player.actions.FindAction("Hold");
 
-            if (action != null && action.IsPressed())
+            if (action == null) continue;
+
+            // Count who is currently holding
+            if (action.IsPressed())
             {
-                holdingPlayer = player;
-                break;
+                holdingCount++;
+            }
+
+            // Detect NEW press (this is the key part)
+            if (action.WasPressedThisFrame())
+            {
+                lastPlayerToHold = player;
             }
         }
 
-        if (holdingPlayer != null)
+        if (holdingCount > 0)
         {
-            int index = players.IndexOf(holdingPlayer);
+            float baseSpeed = 0.3f;
+            float speedMultiplier = Mathf.Pow(2f, holdingCount - 1);
 
-            Color targetColor = playerColors[index];
+            startSlider.value += baseSpeed * speedMultiplier * Time.deltaTime;
 
-            // Smoothly transition to the player's colour
-            startFillImage.color = Color.Lerp(
-                startFillImage.color,
-                targetColor,
-                10f * Time.deltaTime
-            );
+            if (lastPlayerToHold != null)
+            {
+                int index = players.IndexOf(lastPlayerToHold);
+                Color targetColor = playerColors[index];
 
-            startSlider.value += 0.3f * Time.deltaTime;
+                startFillImage.color = Color.Lerp(
+                    startFillImage.color,
+                    targetColor,
+                    10f * Time.deltaTime
+                );
+            }
 
             if (startSlider.value >= startSlider.maxValue)
             {
                 StartGame();
             }
         }
-        
         else
         {
             startSlider.value -= 0.6f * Time.deltaTime;

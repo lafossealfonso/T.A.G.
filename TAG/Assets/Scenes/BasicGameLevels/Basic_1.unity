@@ -5557,8 +5557,12 @@ PrefabInstance:
     m_TransformParent: {fileID: 1723480027}
     m_Modifications:
     - target: {fileID: 1106099040570544901, guid: 39d32831562696d42837f3738cb9fbaa, type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1106099040570544901, guid: 39d32831562696d42837f3738cb9fbaa, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 4.9999847
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1150555256524486193, guid: 39d32831562696d42837f3738cb9fbaa, type: 3}
       propertyPath: m_AnchoredPosition.x
@@ -5595,6 +5599,10 @@ PrefabInstance:
     - target: {fileID: 7756406641256934623, guid: 39d32831562696d42837f3738cb9fbaa, type: 3}
       propertyPath: m_AnchoredPosition.x
       value: -111.609985
+      objectReference: {fileID: 0}
+    - target: {fileID: 7756406641256934623, guid: 39d32831562696d42837f3738cb9fbaa, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 8
       objectReference: {fileID: 0}
     - target: {fileID: 8618829517303815297, guid: 39d32831562696d42837f3738cb9fbaa, type: 3}
       propertyPath: m_Pivot.x
@@ -7547,8 +7555,12 @@ PrefabInstance:
     m_TransformParent: {fileID: 1723480027}
     m_Modifications:
     - target: {fileID: 1106099040570544901, guid: 39d32831562696d42837f3738cb9fbaa, type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1106099040570544901, guid: 39d32831562696d42837f3738cb9fbaa, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 4.9999847
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1150555256524486193, guid: 39d32831562696d42837f3738cb9fbaa, type: 3}
       propertyPath: m_AnchoredPosition.x
@@ -7569,6 +7581,10 @@ PrefabInstance:
     - target: {fileID: 6541387967102591245, guid: 39d32831562696d42837f3738cb9fbaa, type: 3}
       propertyPath: m_Name
       value: PlayerScoreCard (1)
+      objectReference: {fileID: 0}
+    - target: {fileID: 7749974135354048096, guid: 39d32831562696d42837f3738cb9fbaa, type: 3}
+      propertyPath: m_Value
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7749974135354048096, guid: 39d32831562696d42837f3738cb9fbaa, type: 3}
       propertyPath: m_Direction
@@ -9158,6 +9174,10 @@ PrefabInstance:
     - target: {fileID: 7756406641256934623, guid: 39d32831562696d42837f3738cb9fbaa, type: 3}
       propertyPath: m_AnchoredPosition.x
       value: 95.194
+      objectReference: {fileID: 0}
+    - target: {fileID: 7756406641256934623, guid: 39d32831562696d42837f3738cb9fbaa, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 8
       objectReference: {fileID: 0}
     - target: {fileID: 8618829517303815297, guid: 39d32831562696d42837f3738cb9fbaa, type: 3}
       propertyPath: m_Pivot.x
@@ -11722,6 +11742,18 @@ PrefabInstance:
       propertyPath: 'scoreCards.Array.data[3]'
       value: 
       objectReference: {fileID: 1100038426}
+    - target: {fileID: 7341257588045218041, guid: 80e71b9fc9221e944b87e4c47066adc8, type: 3}
+      propertyPath: playerColors.Array.data[0].b
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7341257588045218041, guid: 80e71b9fc9221e944b87e4c47066adc8, type: 3}
+      propertyPath: playerColors.Array.data[0].g
+      value: 0.90943396
+      objectReference: {fileID: 0}
+    - target: {fileID: 7341257588045218041, guid: 80e71b9fc9221e944b87e4c47066adc8, type: 3}
+      propertyPath: playerColors.Array.data[0].r
+      value: 0.7311136
+      objectReference: {fileID: 0}
     - target: {fileID: 7712345436852527775, guid: 80e71b9fc9221e944b87e4c47066adc8, type: 3}
       propertyPath: m_LocalPosition.x
       value: 774.1501
