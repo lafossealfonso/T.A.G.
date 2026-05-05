@@ -12,6 +12,7 @@ public class BasicGameMode : MonoBehaviour
     public List<Transform> spawnPoints;
     public CinemachineCamera winnerCamera;
     [SerializeField] TextMeshProUGUI winnerDisplayName;
+    bool gameEnded;
     private void OnEnable()
     {
         GameManager.OnPlayerTagged += HandlePlayerTagged;
@@ -42,6 +43,23 @@ public class BasicGameMode : MonoBehaviour
         winnerDisplayName.text = playerCard.playerName;
         winnerDisplayName.color = playerCard.playerColor;
         winnerDisplayName.gameObject.transform.parent.gameObject.SetActive(true);
+        gameEnded = true;
+    }
+
+    void Update()
+    {
+        if (gameEnded == false) return;
+
+        bool spacePressed = UnityEngine.InputSystem.Keyboard.current.spaceKey.wasPressedThisFrame;
+
+        bool controllerPressed =
+            UnityEngine.InputSystem.Gamepad.current != null &&
+            UnityEngine.InputSystem.Gamepad.current.buttonNorth.wasPressedThisFrame;
+
+        if (spacePressed || controllerPressed)
+        {
+            Reload();
+        }
     }
 
     public void Reload()

@@ -27,11 +27,18 @@ public class PlayerMovement : MonoBehaviour
     public TrailRenderer trail;
 
     public Basic_PlayerScoreCard thisPlayerScoreCard;
+    public PlayerMenuCard thisPlayerMenuCard;
+    public int playerIndex;
 
     //me when I begin the day
     private void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
+    }
+
+    public void SetPlayerMenuCard(PlayerMenuCard playerMenuCard)
+    {
+        thisPlayerMenuCard = playerMenuCard;
     }
 
     public void SetPlayerVisualColour(Color color)
@@ -60,23 +67,32 @@ public class PlayerMovement : MonoBehaviour
     public void OnMove(InputValue value)
     {
         if (!canMove)
-            return;
-        Vector2 input = value.Get<Vector2>();
-
-        if(Mathf.Abs(input.x) > Mathf.Abs(input.y))
         {
-            moveInput = new Vector2(Mathf.Sign(input.x), 0);
+            
+            thisPlayerMenuCard.PlayFeedback(playerIndex);
         }
 
-        else if(Mathf.Abs(input.y) > 0)
-        {
-            moveInput = new Vector2(0, Mathf.Sign(input.y));
-        }
-        
         else
         {
-            moveInput = Vector2.zero;
+            Vector2 input = value.Get<Vector2>();
+
+            if (Mathf.Abs(input.x) > Mathf.Abs(input.y))
+            {
+                moveInput = new Vector2(Mathf.Sign(input.x), 0);
+            }
+
+            else if (Mathf.Abs(input.y) > 0)
+            {
+                moveInput = new Vector2(0, Mathf.Sign(input.y));
+            }
+
+            else
+            {
+                moveInput = Vector2.zero;
+            }
         }
+            
+        
     }
 
     private void FixedUpdate()

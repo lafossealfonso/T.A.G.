@@ -4,6 +4,7 @@ using UnityEngine;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine.UI;
+using MoreMountains.Feedbacks;
 
 
 public class PlayerManager : MonoBehaviour
@@ -24,6 +25,7 @@ public class PlayerManager : MonoBehaviour
     [SerializeField] Slider startSlider;
     [SerializeField] Image startFillImage;
     private PlayerInput lastPlayerToHold;
+    public MMF_Player startSliderFeedback;
 
     private void Awake()
     {
@@ -43,11 +45,15 @@ public class PlayerManager : MonoBehaviour
     private void OnEnable()
     {
         holdButton.Enable();
+
+        
     }
 
     private void OnDisable()
     {
         holdButton.Disable();
+
+        
     }
     private void OnPlayerJoined(PlayerInput player)
     {
@@ -57,10 +63,13 @@ public class PlayerManager : MonoBehaviour
         string playerName = playerNames[players.IndexOf(player)];
         RegisterPlayer(player.gameObject, playerColor, playerName);
         player.gameObject.GetComponent<PlayerMovement>().SetPlayerVisualColour(playerColor);
+        player.gameObject.GetComponent<PlayerMovement>().SetPlayerMenuCard(playerMenuItems[players.IndexOf(player)]);
+        player.gameObject.GetComponent<PlayerMovement>().playerIndex = players.IndexOf(player);
         player.transform.position = spawnPoints[players.IndexOf(player)].position;
-        playerMenuItems[players.IndexOf(player)].menuText.text = "Ready";
+        playerMenuItems[players.IndexOf(player)].menuText.text = "READY";
         playerMenuItems[players.IndexOf(player)].menuText.fontStyle = (FontStyles)FontStyle.Bold;
         playerMenuItems[players.IndexOf(player)].menuText.color = playerColor;
+        ShakeUI();
 
     }
     private void OnPlayerLeft(PlayerInput player)
@@ -126,6 +135,7 @@ public class PlayerManager : MonoBehaviour
             if (action.WasPressedThisFrame())
             {
                 lastPlayerToHold = player;
+                ShakeUI();
             }
         }
 
@@ -157,5 +167,10 @@ public class PlayerManager : MonoBehaviour
         {
             startSlider.value -= 0.6f * Time.deltaTime;
         }
+    }
+
+    void ShakeUI()
+    {
+        startSliderFeedback.PlayFeedbacks();
     }
 }

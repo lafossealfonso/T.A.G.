@@ -118,6 +118,15 @@ public partial class @Move: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""AnyButton"",
+                    ""type"": ""Button"",
+                    ""id"": ""930ae78e-fd4b-415b-bac4-554bb254d064"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -307,6 +316,28 @@ public partial class @Move: IInputActionCollection2, IDisposable
                     ""action"": ""Hold"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""b1021026-bbb0-465f-ad60-c7abbf24494c"",
+                    ""path"": ""<Keyboard>/anyKey"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""AnyButton"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""33b59cd6-b577-42b6-b38f-4aba17a9ebf5"",
+                    ""path"": ""<Gamepad>/*"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""AnyButton"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -318,6 +349,7 @@ public partial class @Move: IInputActionCollection2, IDisposable
         m_PLACEHOLDER_Move = m_PLACEHOLDER.FindAction("Move", throwIfNotFound: true);
         m_PLACEHOLDER_StartGame = m_PLACEHOLDER.FindAction("StartGame", throwIfNotFound: true);
         m_PLACEHOLDER_Hold = m_PLACEHOLDER.FindAction("Hold", throwIfNotFound: true);
+        m_PLACEHOLDER_AnyButton = m_PLACEHOLDER.FindAction("AnyButton", throwIfNotFound: true);
     }
 
     ~@Move()
@@ -401,6 +433,7 @@ public partial class @Move: IInputActionCollection2, IDisposable
     private readonly InputAction m_PLACEHOLDER_Move;
     private readonly InputAction m_PLACEHOLDER_StartGame;
     private readonly InputAction m_PLACEHOLDER_Hold;
+    private readonly InputAction m_PLACEHOLDER_AnyButton;
     /// <summary>
     /// Provides access to input actions defined in input action map "PLACEHOLDER".
     /// </summary>
@@ -424,6 +457,10 @@ public partial class @Move: IInputActionCollection2, IDisposable
         /// Provides access to the underlying input action "PLACEHOLDER/Hold".
         /// </summary>
         public InputAction @Hold => m_Wrapper.m_PLACEHOLDER_Hold;
+        /// <summary>
+        /// Provides access to the underlying input action "PLACEHOLDER/AnyButton".
+        /// </summary>
+        public InputAction @AnyButton => m_Wrapper.m_PLACEHOLDER_AnyButton;
         /// <summary>
         /// Provides access to the underlying input action map instance.
         /// </summary>
@@ -459,6 +496,9 @@ public partial class @Move: IInputActionCollection2, IDisposable
             @Hold.started += instance.OnHold;
             @Hold.performed += instance.OnHold;
             @Hold.canceled += instance.OnHold;
+            @AnyButton.started += instance.OnAnyButton;
+            @AnyButton.performed += instance.OnAnyButton;
+            @AnyButton.canceled += instance.OnAnyButton;
         }
 
         /// <summary>
@@ -479,6 +519,9 @@ public partial class @Move: IInputActionCollection2, IDisposable
             @Hold.started -= instance.OnHold;
             @Hold.performed -= instance.OnHold;
             @Hold.canceled -= instance.OnHold;
+            @AnyButton.started -= instance.OnAnyButton;
+            @AnyButton.performed -= instance.OnAnyButton;
+            @AnyButton.canceled -= instance.OnAnyButton;
         }
 
         /// <summary>
@@ -540,5 +583,12 @@ public partial class @Move: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnHold(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "AnyButton" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnAnyButton(InputAction.CallbackContext context);
     }
 }
