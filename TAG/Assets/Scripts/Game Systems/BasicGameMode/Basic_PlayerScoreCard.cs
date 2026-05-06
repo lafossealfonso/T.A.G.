@@ -1,3 +1,4 @@
+using MoreMountains.Feedbacks;
 using TMPro;
 using UnityEngine;
 using UnityEngine.SocialPlatforms.Impl;
@@ -14,6 +15,9 @@ public class Basic_PlayerScoreCard : MonoBehaviour
     bool playerIsAssigned = false;
     public string playerName;
     public Color playerColor;
+    [SerializeField] MMF_Player feedbackPlayer;
+    bool feedbackStarted = false;
+    [SerializeField] private AnimationCurve intensityCurve;
 
 
     public void AssignPlayer(GameObject player, Color color, string name)
@@ -38,29 +42,51 @@ public class Basic_PlayerScoreCard : MonoBehaviour
     {
         PlayerName.gameObject.SetActive(false);
         scoreSlider.gameObject.SetActive(false);
+        feedbackPlayer.FeedbacksIntensity = 0f;
     }
 
     private void Update()
     {
+        float normalizedTime = scoreSlider.value / scoreSlider.maxValue;
+        float curveValue = intensityCurve.Evaluate(normalizedTime);
+
+        // START
+        if (curveValue > 0f && !feedbackStarted)
+        {
+            feedbackPlayer.PlayFeedbacks();
+            feedbackStarted = true;
+        }
+
+        // STOP
+        if (curveValue <= 0f && feedbackStarted)
+        {
+            feedbackPlayer.StopFeedbacks();
+            feedbackStarted = false;
+        }
+
+        // UPDATE
+        if (feedbackStarted)
+        {
+            feedbackPlayer.FeedbacksIntensity = curveValue;
+        }
 
         if (playerIsAssigned)
         {
             if (playerMovementScript.isIt)
             {
+                
                 scoreSlider.value += fillSpeed * Time.deltaTime;
 
                 if (scoreSlider.value >= scoreSlider.maxValue)
                 {
                     GameManager.Instance.WinnerEvent(assignedPlayer);
+
                 }
             }
 
             else if (playerMovementScript.isIt == false)
             {
                 scoreSlider.value -= fillSpeed * 0.3f * Time.deltaTime;
-
-                
-
             }
         }
         

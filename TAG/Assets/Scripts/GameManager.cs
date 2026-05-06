@@ -1,3 +1,4 @@
+using MoreMountains.Feedbacks;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
@@ -10,6 +11,10 @@ public class GameManager : MonoBehaviour
     public static GameManager Instance;
     public static event Action<GameObject, GameObject> OnPlayerTagged;
     public static event Action<GameObject> OnWinnerChosen;
+
+    [Header("Feedback Setups")]
+    [SerializeField] MMF_Player playerTaggedEffectPlayer;
+    [SerializeField] MMF_Player cameraTeleportEffectPlayer;
 
     private void Awake()
     {
@@ -32,6 +37,7 @@ public class GameManager : MonoBehaviour
         Debug.Log(taggedPlayer.name + "was Tagged");
 
         OnPlayerTagged?.Invoke(taggingPlayer,taggedPlayer);
+        playerTaggedEffectPlayer.PlayFeedbacks();
     }
 
     public void RemoveFromCinemachineTargetGroup(Transform transform)
