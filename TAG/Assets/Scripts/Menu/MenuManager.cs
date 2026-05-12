@@ -1,6 +1,8 @@
-using UnityEngine;
 using MoreMountains.Feedbacks;
 using System.Collections;
+using UnityEditor.SearchService;
+using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class MenuManager : MonoBehaviour
 {
@@ -11,6 +13,11 @@ public class MenuManager : MonoBehaviour
     public void ProgressMenu(GameObject menu)
     {
         StartCoroutine(ProgressMenuCoroutine(menu));
+    }
+
+    public void LoadLevelScene(string sceneName)
+    {
+        SceneManager.LoadScene(sceneName);
     }
 
     private IEnumerator ProgressMenuCoroutine(GameObject menu)
