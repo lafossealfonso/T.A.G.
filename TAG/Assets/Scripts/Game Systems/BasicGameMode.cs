@@ -1,6 +1,7 @@
 using DG.Tweening.Core.Easing;
 using MoreMountains.Feedbacks;
 using NUnit.Framework;
+using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using Unity.Cinemachine;
@@ -14,11 +15,14 @@ public class BasicGameMode : MonoBehaviour
     public List<Transform> spawnPoints;
     public CinemachineCamera winnerCamera;
     [SerializeField] TextMeshProUGUI winnerDisplayName;
+    [Header("Game Manager Set-Up")]
+    [SerializeField] MMF_Player feedbackPlayerTagged;
     bool gameEnded;
     private void OnEnable()
     {
         GameManager.OnPlayerTagged += HandlePlayerTagged;
         GameManager.OnWinnerChosen += WinnerSequence;
+        SceneManager.sceneLoaded += OnSceneLoaded;
     }
 
     private void OnDisable()
@@ -27,15 +31,18 @@ public class BasicGameMode : MonoBehaviour
         GameManager.OnWinnerChosen -= WinnerSequence;
     }
 
+    
+
     private void Start()
     {
-        startFadePlayer.PlayFeedbacks();
+        //startFadePlayer.PlayFeedbacks();
+        GameManager.Instance.playerTaggedEffectPlayer = feedbackPlayerTagged;
     }
 
     void HandlePlayerTagged(GameObject taggingPlayer, GameObject taggedPlayer)
     {
         taggingPlayer.GetComponent<PlayerMovement>().setIsIt(true);
-        taggedPlayer.transform.position = spawnPoints[Random.Range(0, spawnPoints.Count)].position;
+        //taggedPlayer.transform.position = spawnPoints[Random.Range(0, spawnPoints.Count)].position;
 
         
     }
@@ -72,5 +79,17 @@ public class BasicGameMode : MonoBehaviour
     public void Reload()
     {
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+    }
+
+    private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    {
+        StartCoroutine(OnSceneReady());
+    }
+    private IEnumerator OnSceneReady()
+    {
+        yield return new WaitForEndOfFrame();
+        yield return null;
+
+        startFadePlayer.PlayFeedbacks();
     }
 }

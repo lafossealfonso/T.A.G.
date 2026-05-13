@@ -13,23 +13,19 @@ public class GameManager : MonoBehaviour
     public static event Action<GameObject> OnWinnerChosen;
 
     [Header("Feedback Setups")]
-    [SerializeField] MMF_Player playerTaggedEffectPlayer;
+    public MMF_Player playerTaggedEffectPlayer;
     [SerializeField] MMF_Player cameraTeleportEffectPlayer;
 
     private void Awake()
     {
-        if (Instance == null)
+        if (Instance != null && Instance != this)
         {
-            Instance = this;
+            Destroy(gameObject);
+            return;
         }
 
-        else { Destroy(gameObject); }
-    }
-
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
-    {
-        DontDestroyOnLoad(this);
+        Instance = this;
+        DontDestroyOnLoad(gameObject);
     }
 
     public void PlayerTagged(GameObject taggingPlayer, GameObject taggedPlayer)
@@ -48,5 +44,15 @@ public class GameManager : MonoBehaviour
     public void WinnerEvent(GameObject winningPlayer)
     {
         OnWinnerChosen?.Invoke(winningPlayer);
+    }
+
+    public void ManagerSuicide()
+    {
+        Destroy(this);
+    }
+
+    public void SendToScene()
+    {
+
     }
 }

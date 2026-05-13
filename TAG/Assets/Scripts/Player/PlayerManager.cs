@@ -66,17 +66,22 @@ public class PlayerManager : MonoBehaviour
         player.gameObject.GetComponent<PlayerMovement>().SetPlayerMenuCard(playerMenuItems[players.IndexOf(player)]);
         player.gameObject.GetComponent<PlayerMovement>().playerIndex = players.IndexOf(player);
         player.transform.position = spawnPoints[players.IndexOf(player)].position;
-        playerMenuItems[players.IndexOf(player)].menuText.text = "READY";
-        playerMenuItems[players.IndexOf(player)].menuText.fontStyle = (FontStyles)FontStyle.Bold;
-        playerMenuItems[players.IndexOf(player)].menuText.color = playerColor;
+        playerMenuItems[players.IndexOf(player)].ReadyUp(playerColor);
         ShakeUI();
 
     }
     private void OnPlayerLeft(PlayerInput player)
     {
+        int index = players.IndexOf(player);
+
+        if (index < 0 || index >= playerMenuItems.Count)
+            return;
+
         targetGroup.RemoveMember(player.gameObject.transform);
+
         players.Remove(player);
-        playerMenuItems[players.IndexOf(player)].menuText.text = "Press X / Enter\r\nto Join";
+
+        playerMenuItems[index].menuText.text = "Press X / Enter\r\nto Join";
     }
     public void StartGame()
     {
