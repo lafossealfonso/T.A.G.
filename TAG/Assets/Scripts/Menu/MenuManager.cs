@@ -1,5 +1,7 @@
 using MoreMountains.Feedbacks;
 using System.Collections;
+using System.Collections.Generic;
+using Unity.Collections;
 using UnityEditor.SearchService;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -7,19 +9,44 @@ using UnityEngine.SceneManagement;
 public class MenuManager : MonoBehaviour
 {
     public MMF_Player transitionPlayer;
+    [SerializeField] List<MMF_Player> feedbackPlayOnStart;
 
     public GameObject currentMenu;
+
+    private void Start()
+    {
+        foreach(MMF_Player player in feedbackPlayOnStart)
+        {
+            if (player != null)
+            {
+                player.PlayFeedbacks();
+            }
+        }
+    }
 
     public void ProgressMenu(GameObject menu)
     {
         StartCoroutine(ProgressMenuCoroutine(menu));
     }
 
-    public void LoadLevelScene(string sceneName)
+    private IEnumerator LoadSceneCoroutine(string sceneName)
     {
+        transitionPlayer.FeedbacksList[0].Play(Vector3.zero);
+
+        yield return new WaitForSeconds(
+            transitionPlayer.FeedbacksList[0].FeedbackDuration
+        );
+
         SceneManager.LoadScene(sceneName);
+
     }
 
+    public void LoadLevelScene(string sceneName)
+    {
+        StartCoroutine(LoadSceneCoroutine(sceneName));
+    }
+
+    
     private IEnumerator ProgressMenuCoroutine(GameObject menu)
     {
         // Fade in to black

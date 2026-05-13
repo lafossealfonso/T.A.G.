@@ -1,4 +1,5 @@
 using DG.Tweening.Core.Easing;
+using MoreMountains.Feedbacks;
 using NUnit.Framework;
 using System.Collections.Generic;
 using TMPro;
@@ -8,6 +9,7 @@ using UnityEngine.SceneManagement;
 
 public class BasicGameMode : MonoBehaviour
 {
+    [SerializeField] MMF_Player startFadePlayer;
     public PlayerManager playerManager;
     public List<Transform> spawnPoints;
     public CinemachineCamera winnerCamera;
@@ -23,6 +25,11 @@ public class BasicGameMode : MonoBehaviour
     {
         GameManager.OnPlayerTagged -= HandlePlayerTagged;
         GameManager.OnWinnerChosen -= WinnerSequence;
+    }
+
+    private void Start()
+    {
+        startFadePlayer.PlayFeedbacks();
     }
 
     void HandlePlayerTagged(GameObject taggingPlayer, GameObject taggedPlayer)
