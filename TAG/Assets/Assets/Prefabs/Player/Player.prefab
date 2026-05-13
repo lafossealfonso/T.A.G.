@@ -55,7 +55,7 @@ SpriteRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 9dfc825aed78fcd4ba02077103263b40, type: 2}
+  - {fileID: 2100000, guid: f1237a2cb0360724ab4e27309ec2b807, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -371,7 +371,7 @@ SpriteRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 9dfc825aed78fcd4ba02077103263b40, type: 2}
+  - {fileID: 2100000, guid: f1237a2cb0360724ab4e27309ec2b807, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -490,6 +490,8 @@ MonoBehaviour:
   itIndicator: {fileID: 2246180133258608889}
   trail: {fileID: 8436401610450748615}
   thisPlayerScoreCard: {fileID: 0}
+  thisPlayerMenuCard: {fileID: 0}
+  playerIndex: 0
 --- !u!114 &8090513575330720346
 MonoBehaviour:
   m_ObjectHideFlags: 0
