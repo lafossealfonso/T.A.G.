@@ -12,7 +12,8 @@ public class BasicGameMode : MonoBehaviour
 {
     [SerializeField] MMF_Player startFadePlayer;
     public PlayerManager playerManager;
-    public List<Transform> spawnPoints;
+    public List<Transform> startPoints;
+    public Transform spawnPoint;
     public CinemachineCamera winnerCamera;
     [SerializeField] TextMeshProUGUI winnerDisplayName;
     [Header("Game Manager Set-Up")]
@@ -42,7 +43,7 @@ public class BasicGameMode : MonoBehaviour
     void HandlePlayerTagged(GameObject taggingPlayer, GameObject taggedPlayer)
     {
         taggingPlayer.GetComponent<PlayerMovement>().setIsIt(true);
-        //taggedPlayer.transform.position = spawnPoints[Random.Range(0, spawnPoints.Count)].position;
+        taggedPlayer.transform.position = spawnPoint.position;
 
         
     }
