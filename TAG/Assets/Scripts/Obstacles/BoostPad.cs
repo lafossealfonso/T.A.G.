@@ -1,11 +1,13 @@
+using MoreMountains.Feedbacks;
 using UnityEngine;
 
 public class BoostPad : MonoBehaviour
 {
     public float forceAmount;
+    [SerializeField] MMF_Player boostFeedback;
     private void OnTriggerEnter2D(Collider2D other)
     {
-        
+        boostFeedback.PlayFeedbacks();
         if (other.gameObject.CompareTag("Player"))
         {
             PlayerMovement playerMovement = other.GetComponent<PlayerMovement>();

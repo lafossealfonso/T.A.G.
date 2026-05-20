@@ -142,8 +142,9 @@ public class PlayerMovement : MonoBehaviour
     //-----------------------------------------------
     public void BoostPad()
     {
-        Vector2 direction = moveInput;
-        rb.AddForce(direction.normalized * boostForce, ForceMode2D.Impulse);
+        Rigidbody2D rb = GetComponent<Rigidbody2D>();
+        Vector2 direction = rb.linearVelocity.normalized;
+        rb.AddForce(direction * boostForce, ForceMode2D.Impulse);
     }
     //-----------------------------------------------
     public void SlowPad()
