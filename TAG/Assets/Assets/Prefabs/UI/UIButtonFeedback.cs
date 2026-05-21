@@ -8,6 +8,9 @@ public class UIButtonFeedback : MonoBehaviour, IPointerEnterHandler, IPointerExi
 
     [SerializeField] MMF_Player onHoverFeedbackPlayer;
     [SerializeField] MMF_Player onExitFeedbackPlayer;
+    [SerializeField] LevelDisplay levelDisplayScript;
+    [SerializeField] int thisIndexInt = 0;
+    [SerializeField] bool displaylevel = false;
     public void OnPointerEnter(PointerEventData eventData)
     {
         HoverEnter();
@@ -21,6 +24,7 @@ public class UIButtonFeedback : MonoBehaviour, IPointerEnterHandler, IPointerExi
     void HoverEnter()
     {
         onHoverFeedbackPlayer.PlayFeedbacks();
+        if(displaylevel) levelDisplayScript.SetIndexTo(thisIndexInt);
     }
 
     void HoverExit()
