@@ -949,11 +949,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   startFadePlayer: {fileID: 5790866040191930265}
   playerManager: {fileID: 0}
-  spawnPoints:
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
+  startPoints: []
+  spawnPoint: {fileID: 0}
   winnerCamera: {fileID: 0}
   winnerDisplayName: {fileID: 5758460778460933956}
   feedbackPlayerTagged: {fileID: 0}

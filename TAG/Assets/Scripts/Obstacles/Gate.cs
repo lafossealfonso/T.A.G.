@@ -1,5 +1,7 @@
 using UnityEngine;
 using System.Collections;
+using Unity.VisualScripting;
+using UnityEngine.PlayerLoop;
 
 public class Gate : MonoBehaviour
 {
@@ -30,6 +32,8 @@ public class Gate : MonoBehaviour
     [SerializeField] float minWaitTime = 1f;
     [SerializeField] float maxWaitTime = 4f;
 
+    bool isPlaying = false;
+
     bool isOpen = false;
 
     void Start()
@@ -38,6 +42,26 @@ public class Gate : MonoBehaviour
         rightGate.localPosition = rightClosedPos;
 
         StartCoroutine(GateLoop());
+        
+        
+    }
+
+    Coroutine gateLoopCoroutine;
+    private void OnEnable()
+    {
+        if (gateLoopCoroutine == null)
+        {
+            gateLoopCoroutine = StartCoroutine(GateLoop());
+        }
+    }
+
+    private void OnDisable()
+    {
+        if (gateLoopCoroutine != null)
+        {
+            StopCoroutine(gateLoopCoroutine);
+            gateLoopCoroutine = null;
+        }
     }
 
     IEnumerator GateLoop()

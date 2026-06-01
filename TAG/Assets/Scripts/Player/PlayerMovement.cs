@@ -17,6 +17,7 @@ public class PlayerMovement : MonoBehaviour
 
     private Rigidbody2D rb;
     private Vector2 moveInput;
+    [SerializeField] float isItSpeedMultiplier;
 
     public bool canMove = false;
     public bool isIt = false;
@@ -68,31 +69,11 @@ public class PlayerMovement : MonoBehaviour
     {
         if (!canMove)
         {
-            
             thisPlayerMenuCard.PlayFeedback(playerIndex);
+            return;
         }
 
-        else
-        {
-            Vector2 input = value.Get<Vector2>();
-
-            if (Mathf.Abs(input.x) > Mathf.Abs(input.y))
-            {
-                moveInput = new Vector2(Mathf.Sign(input.x), 0);
-            }
-
-            else if (Mathf.Abs(input.y) > 0)
-            {
-                moveInput = new Vector2(0, Mathf.Sign(input.y));
-            }
-
-            else
-            {
-                moveInput = Vector2.zero;
-            }
-        }
-            
-        
+        moveInput = value.Get<Vector2>();
     }
 
     private void FixedUpdate()
@@ -103,10 +84,21 @@ public class PlayerMovement : MonoBehaviour
 
     private void Move()
     {
-        rb.linearVelocity = new Vector2(
+        if (isIt)
+        {
+            rb.linearVelocity = new Vector2(
+            moveInput.x * moveSpeed,
+            moveInput.y * moveSpeed
+        ) + rb.linearVelocity * 0.88f;
+        }
+
+        else
+        {
+            rb.linearVelocity = new Vector2(
             moveInput.x * moveSpeed,
             moveInput.y * moveSpeed
         ) + rb.linearVelocity * 0.9f;
+        }
     }
 
     private void RotateDirection()

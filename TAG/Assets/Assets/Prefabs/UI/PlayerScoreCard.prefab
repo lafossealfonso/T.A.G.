@@ -244,7 +244,7 @@ MonoBehaviour:
   PlayerName: {fileID: 6269991854289771828}
   scoreSlider: {fileID: 7749974135354048096}
   fillSlideRenderer: {fileID: 1907203726722093754}
-  fillSpeed: 3
+  fillSpeed: 2
   playerName: 
   playerColor: {r: 0, g: 0, b: 0, a: 0}
   feedbackPlayer: {fileID: 4288763380770016171}

@@ -30,9 +30,10 @@ public class BasicGameMode : MonoBehaviour
     {
         GameManager.OnPlayerTagged -= HandlePlayerTagged;
         GameManager.OnWinnerChosen -= WinnerSequence;
+        SceneManager.sceneLoaded -= OnSceneLoaded;
     }
 
-    
+
 
     private void Start()
     {
@@ -79,11 +80,14 @@ public class BasicGameMode : MonoBehaviour
 
     public void Reload()
     {
-        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+        //SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+        SceneManager.LoadScene("Menu");
     }
 
     private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
+        if (!this || gameObject == null) return;
+
         StartCoroutine(OnSceneReady());
     }
     private IEnumerator OnSceneReady()
