@@ -3,7 +3,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-public class UIButtonFeedback : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
+public class UIButtonFeedback : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, ISelectHandler, IDeselectHandler
 {
 
     [SerializeField] MMF_Player onHoverFeedbackPlayer;
@@ -20,14 +20,24 @@ public class UIButtonFeedback : MonoBehaviour, IPointerEnterHandler, IPointerExi
     {
         HoverExit();
     }
+
+    public void OnSelect(BaseEventData eventData)
+    {
+        HoverEnter();
+    }
+
+    public void OnDeselect(BaseEventData eventData)
+    {
+        HoverExit();
+    }
     
-    void HoverEnter()
+    public void HoverEnter()
     {
         onHoverFeedbackPlayer.PlayFeedbacks();
         if(displaylevel) levelDisplayScript.SetIndexTo(thisIndexInt);
     }
 
-    void HoverExit()
+    public void HoverExit()
     {
         onExitFeedbackPlayer.PlayFeedbacks();
     }

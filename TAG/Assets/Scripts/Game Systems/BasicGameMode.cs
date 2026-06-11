@@ -19,6 +19,8 @@ public class BasicGameMode : MonoBehaviour
     [Header("Game Manager Set-Up")]
     [SerializeField] MMF_Player feedbackPlayerTagged;
     bool gameEnded;
+    [SerializeField] bool funnyOn = false;
+    [SerializeField] FunnyScript funnyScript;
     private void OnEnable()
     {
         GameManager.OnPlayerTagged += HandlePlayerTagged;
@@ -45,6 +47,11 @@ public class BasicGameMode : MonoBehaviour
     {
         taggingPlayer.GetComponent<PlayerMovement>().setIsIt(true);
         taggedPlayer.transform.position = spawnPoint.position;
+
+        if(funnyOn == true)
+        {
+            funnyScript.PlayFunny();
+        }
 
         
     }

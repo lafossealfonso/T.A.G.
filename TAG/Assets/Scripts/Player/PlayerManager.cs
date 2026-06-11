@@ -18,14 +18,16 @@ public class PlayerManager : MonoBehaviour
     [SerializeField] private List<PlayerInput> players;
     [SerializeField] public List<Basic_PlayerScoreCard> scoreCards;
     [SerializeField] List<GameObject> joinedPlayers = new List<GameObject>();
-    [SerializeField] List<Color> playerColors;
-    [SerializeField] List<string> playerNames;
+    [SerializeField] List<PlayerProfile> playerProfiles;
+    private Dictionary<PlayerInput, int> selectedProfiles = new();
+    private Dictionary<PlayerInput, float> profileInputCooldown = new();
     public InputAction holdButton;
-    bool hasGameStarted = false;
+    public bool hasGameStarted = false;
     [SerializeField] Slider startSlider;
     [SerializeField] Image startFillImage;
     private PlayerInput lastPlayerToHold;
     public MMF_Player startSliderFeedback;
+    public Sprite defaultPlayerSprite;
 
     private void Awake()
     {
@@ -57,19 +59,50 @@ public class PlayerManager : MonoBehaviour
     }
     private void OnPlayerJoined(PlayerInput player)
     {
-        targetGroup.AddMember(player.gameObject.transform, 0.5f, 1);
+        targetGroup.AddMember(player.transform, 0.5f, 1);
         players.Add(player);
-        Color playerColor = playerColors[players.IndexOf(player)];
-        string playerName = playerNames[players.IndexOf(player)];
-        RegisterPlayer(player.gameObject, playerColor, playerName);
-        player.gameObject.GetComponent<PlayerMovement>().SetPlayerVisualColour(playerColor);
-        player.gameObject.GetComponent<PlayerMovement>().SetPlayerMenuCard(playerMenuItems[players.IndexOf(player)]);
-        player.gameObject.GetComponent<PlayerMovement>().playerIndex = players.IndexOf(player);
-        player.transform.position = spawnPoints[players.IndexOf(player)].position;
-        playerMenuItems[players.IndexOf(player)].ReadyUp(playerColor);
-        ShakeUI();
 
+        int profileIndex = GetFirstAvailableProfile();
+        selectedProfiles[player] = profileIndex;
+        profileInputCooldown[player] = 0f;
+
+        ApplyProfile(player, profileIndex);
+
+        PlayerMovement movement = player.GetComponent<PlayerMovement>();
+
+        int playerIndex = players.IndexOf(player);
+
+        movement.playerIndex = playerIndex;
+        player.transform.position = spawnPoints[playerIndex].position;
+
+        RegisterPlayer(
+            player.gameObject,
+            playerProfiles[playerIndex]);
+
+        ShakeUI();
     }
+
+    public void CycleProfile(PlayerInput player, int direction)
+    {
+        if (!selectedProfiles.ContainsKey(player))
+            return;
+
+        int current = selectedProfiles[player];
+        int count = playerProfiles.Count;
+
+        for (int i = 1; i <= count; i++)
+        {
+            int next = (current + direction * i + count) % count;
+
+            if (!selectedProfiles.ContainsValue(next))
+            {
+                selectedProfiles[player] = next;
+
+                ApplyProfile(player, next); // 🔥 everything updates here
+                return;
+            }
+        }
+    }   
     private void OnPlayerLeft(PlayerInput player)
     {
         int index = players.IndexOf(player);
@@ -93,7 +126,56 @@ public class PlayerManager : MonoBehaviour
         playerInputManager.DisableJoining();
     }
 
-    public void RegisterPlayer(GameObject player, Color playerColor, string playerName)
+    private int GetFirstAvailableProfile()
+    {
+        for (int i = 0; i < playerProfiles.Count; i++)
+        {
+            bool inUse = selectedProfiles.ContainsValue(i);
+
+            if (!inUse)
+                return i;
+        }
+
+        return 0;
+    }
+
+    private void ApplyProfile(PlayerInput player, int profileIndex)
+    {
+        PlayerProfile profile = playerProfiles[profileIndex];
+
+        PlayerMovement movement = player.GetComponent<PlayerMovement>();
+
+        int playerIndex = players.IndexOf(player);
+
+        // ------------------------
+        // VISUAL PLAYER SETUP
+        // ------------------------
+
+        movement.SetPlayerVisualColour(profile.playerColor);
+
+        if (profile.isSprite)
+        {
+            movement.SetPlayerSprite(profile.playerSprite, true);
+        }
+        else
+        {
+            movement.SetPlayerSprite(defaultPlayerSprite, false);
+        }
+
+        // ------------------------
+        // MENU CARD UPDATE
+        // ------------------------
+
+        PlayerMenuCard card = playerMenuItems[playerIndex];
+        scoreCards[playerIndex].UpdateProfileCard(profile.playerColor, profile.playerName);
+
+        movement.SetPlayerMenuCard(card);
+
+        card.menuText.text = profile.playerName;
+        card.ReadyUp(profile.playerColor);
+    }
+
+    public void RegisterPlayer(GameObject player, PlayerProfile playerProfile)
     {
         joinedPlayers.Add(player);
 
@@ -101,7 +183,7 @@ public class PlayerManager : MonoBehaviour
 
         if(index < scoreCards.Count)
         {
-            scoreCards[index].AssignPlayer(player, playerColor, playerName);
+            scoreCards[index].AssignPlayer(player, playerProfile.playerColor, playerProfile.playerName);
         }
     }
 
@@ -116,6 +198,38 @@ public class PlayerManager : MonoBehaviour
     private void Update()
     {
         ColorFillSlider();
+        if(hasGameStarted == false)
+        {
+            HandleProfileSelection();
+        }
+    }
+
+    private void HandleProfileSelection()
+    {
+        foreach (PlayerInput player in players)
+        {
+            if (!profileInputCooldown.ContainsKey(player))
+                continue;
+
+            profileInputCooldown[player] -= Time.deltaTime;
+
+            Vector2 moveInput =
+                player.actions.FindAction("Move").ReadValue<Vector2>();
+
+            if (profileInputCooldown[player] > 0f)
+                continue;
+
+            if (moveInput.x > 0.5f)
+            {
+                CycleProfile(player, 1);
+                profileInputCooldown[player] = 0.25f;
+            }
+            else if (moveInput.x < -0.5f)
+            {
+                CycleProfile(player, -1);
+                profileInputCooldown[player] = 0.25f;
+            }
+        }
     }
 
     private void ColorFillSlider()
@@ -153,8 +267,8 @@ public class PlayerManager : MonoBehaviour
 
             if (lastPlayerToHold != null)
             {
-                int index = players.IndexOf(lastPlayerToHold);
-                Color targetColor = playerColors[index];
+                int index = selectedProfiles[lastPlayerToHold];
+                Color targetColor = playerProfiles[index].playerColor;
 
                 startFillImage.color = Color.Lerp(
                     startFillImage.color,
@@ -166,6 +280,7 @@ public class PlayerManager : MonoBehaviour
             if (startSlider.value >= startSlider.maxValue)
             {
                 StartGame();
+                hasGameStarted = true;
             }
         }
         else

@@ -32,7 +32,7 @@ public class Gate : MonoBehaviour
     [SerializeField] float minWaitTime = 1f;
     [SerializeField] float maxWaitTime = 4f;
 
-    bool isPlaying = false;
+    [SerializeField] bool inMenu = false;
 
     bool isOpen = false;
 
@@ -49,7 +49,7 @@ public class Gate : MonoBehaviour
     Coroutine gateLoopCoroutine;
     private void OnEnable()
     {
-        if (gateLoopCoroutine == null)
+        if (gateLoopCoroutine == null && inMenu)
         {
             gateLoopCoroutine = StartCoroutine(GateLoop());
         }
@@ -57,7 +57,7 @@ public class Gate : MonoBehaviour
 
     private void OnDisable()
     {
-        if (gateLoopCoroutine != null)
+        if (gateLoopCoroutine != null && inMenu)
         {
             StopCoroutine(gateLoopCoroutine);
             gateLoopCoroutine = null;

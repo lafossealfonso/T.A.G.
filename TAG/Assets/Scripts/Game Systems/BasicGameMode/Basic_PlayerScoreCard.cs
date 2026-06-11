@@ -38,6 +38,16 @@ public class Basic_PlayerScoreCard : MonoBehaviour
         UpdateUI();
     }
 
+    public void UpdateProfileCard(Color colour, string name)
+    {
+        PlayerName.text = name;
+        playerName = name;
+        playerColor = colour;
+        SetUIColor(colour);
+        UpdateUI();
+
+    }
+
     private void Start()
     {
         PlayerName.gameObject.SetActive(false);

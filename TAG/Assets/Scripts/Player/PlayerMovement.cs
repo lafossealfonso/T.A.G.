@@ -42,6 +42,15 @@ public class PlayerMovement : MonoBehaviour
         thisPlayerMenuCard = playerMenuCard;
     }
 
+    public void SetPlayerSprite(Sprite sprite, bool isWhite)
+    {
+        playerVisual.sprite = sprite;
+        if (isWhite)
+        {
+            playerVisual.color = Color.white;
+        }
+    }
+
     public void SetPlayerVisualColour(Color color)
     {
         playerVisual.color = color;

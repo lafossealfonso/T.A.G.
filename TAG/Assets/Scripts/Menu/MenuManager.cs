@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using Unity.Collections;
 using UnityEditor.SearchService;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.SceneManagement;
 
 public class MenuManager : MonoBehaviour
@@ -20,6 +21,17 @@ public class MenuManager : MonoBehaviour
             if (player != null)
             {
                 player.PlayFeedbacks();
+            }
+        }
+
+        if(currentMenu != null)
+        {
+            MenuPage page = currentMenu.GetComponent<MenuPage>();
+
+            if (page != null && page.defaultButton != null)
+            {
+                EventSystem.current.SetSelectedGameObject(
+                    page.defaultButton.gameObject);
             }
         }
     }
@@ -63,6 +75,16 @@ public class MenuManager : MonoBehaviour
 
         menu.SetActive(true);
         currentMenu = menu;
+
+        yield return null;
+
+        MenuPage page = menu.GetComponent<MenuPage>();
+
+        if(page != null && page.defaultButton != null)
+        {
+            EventSystem.current.SetSelectedGameObject(
+                page.defaultButton.gameObject);
+        }
 
         // Fade back out
         transitionPlayer.FeedbacksList[1].Play(Vector3.zero);

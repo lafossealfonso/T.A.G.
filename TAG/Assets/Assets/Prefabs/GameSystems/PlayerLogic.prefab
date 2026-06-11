@@ -1622,16 +1622,10 @@ MonoBehaviour:
   - {fileID: 0}
   - {fileID: 0}
   joinedPlayers: []
-  playerColors:
-  - {r: 1, g: 0.37254903, b: 0.12156863, a: 1}
-  - {r: 0.4776926, g: 0, b: 1, a: 1}
-  - {r: 0, g: 1, b: 0.63892317, a: 1}
-  - {r: 1, g: 0.1490565, b: 0.85817623, a: 1}
-  playerNames:
-  - AMBER
-  - INDIGO
-  - SPRING
-  - MAGENTA
+  playerProfiles:
+  - {fileID: 11400000, guid: 90a1683e8a502d84aaae0d544815b86c, type: 2}
+  - {fileID: 11400000, guid: e1644d0eb698c6d45978f0afc3cbcc4c, type: 2}
+  - {fileID: 11400000, guid: 9a91174d3d78d4f4f968738c82624dc6, type: 2}
   holdButton:
     m_Name: Hold Button
     m_Type: 0
@@ -1660,6 +1654,7 @@ MonoBehaviour:
   startSlider: {fileID: 7706872104456175060}
   startFillImage: {fileID: 7836806617909323476}
   startSliderFeedback: {fileID: 7999208985776408676}
+  defaultPlayerSprite: {fileID: 7482667652216324306, guid: 311925a002f4447b3a28927169b83ea6, type: 3}
 --- !u!114 &8254429214906462570
 MonoBehaviour:
   m_ObjectHideFlags: 0
