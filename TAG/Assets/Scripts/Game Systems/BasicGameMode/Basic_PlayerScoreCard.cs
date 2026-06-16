@@ -1,4 +1,5 @@
 using MoreMountains.Feedbacks;
+using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.SocialPlatforms.Impl;
@@ -7,9 +8,26 @@ using UnityEngine.UI;
 public class Basic_PlayerScoreCard : MonoBehaviour
 {
     [SerializeField] TextMeshProUGUI PlayerName;
+    [Header("Sliders")]
     [SerializeField] Slider scoreSlider;
+    [SerializeField] Slider reverseScoreSlider;
+    [SerializeField] Slider decorSlider;
+    [SerializeField] private AnimationCurve fillCurve = AnimationCurve.Linear(0, 0, 1, 1);
+    [SerializeField] private float duration = 0.8f;
+    private float timer;
+    bool decorFill = false;
+
     [SerializeField] Image fillSlideRenderer;
+    
+    
     [SerializeField] public float fillSpeed;
+    [Header("Percentage")]
+    [SerializeField] TextMeshProUGUI percentageText;
+    [SerializeField] Image percentageImage;
+    [Header("Turn Off Objects")]
+    [SerializeField] List<GameObject> turnOffObjectList;
+    [Header("Decor Items")]
+    [SerializeField] List<Image> recolorImageList;
     private GameObject assignedPlayer;
     private PlayerMovement playerMovementScript;
     bool playerIsAssigned = false;
@@ -22,8 +40,13 @@ public class Basic_PlayerScoreCard : MonoBehaviour
 
     public void AssignPlayer(GameObject player, Color color, string name)
     {
-        PlayerName.gameObject.SetActive(true);
-        scoreSlider.gameObject.SetActive(true);
+        foreach (GameObject item in  turnOffObjectList)
+        {
+            item.SetActive(true);
+        }
+
+        decorFill = true;
+
         scoreSlider.value = 0;
         //PlayerCounterText.gameObject.SetActive(true);
         assignedPlayer = player;
@@ -35,6 +58,11 @@ public class Basic_PlayerScoreCard : MonoBehaviour
         playerIsAssigned = true;
         playerName = name;
         PlayerName.text = name;
+        percentageText.color = color;
+        foreach (Image image in recolorImageList) 
+        {
+            image.color = color;
+        }
         UpdateUI();
     }
 
@@ -50,13 +78,41 @@ public class Basic_PlayerScoreCard : MonoBehaviour
 
     private void Start()
     {
-        PlayerName.gameObject.SetActive(false);
-        scoreSlider.gameObject.SetActive(false);
+        foreach (GameObject item in turnOffObjectList)
+        {
+            item.SetActive(false);
+        }
         feedbackPlayer.FeedbacksIntensity = 0f;
+        decorSlider.value = 0f;
+        decorFill = false;
     }
+    private void DecorFillSlider()
+    {
+        if (!decorFill) return;
+
+        timer += Time.deltaTime;
+
+        float t = Mathf.Clamp01(timer / duration);
+
+        // evaluate curve (controls speed)
+        float curved = fillCurve.Evaluate(t);
+
+        decorSlider.value = curved * 100f;
+
+        if (t >= 1f)
+        {
+            decorFill = false;
+            timer = 0f;
+        }
+    }
+
 
     private void Update()
     {
+
+        DecorFillSlider();
+        percentageText.text = Mathf.RoundToInt(scoreSlider.value).ToString() + "%";
+
         float normalizedTime = scoreSlider.value / scoreSlider.maxValue;
         float curveValue = intensityCurve.Evaluate(normalizedTime);
 
@@ -92,11 +148,14 @@ public class Basic_PlayerScoreCard : MonoBehaviour
                     GameManager.Instance.WinnerEvent(assignedPlayer);
 
                 }
+
+                reverseScoreSlider.value -= fillSpeed * Time.deltaTime;
             }
 
             else if (playerMovementScript.isIt == false)
             {
                 scoreSlider.value -= fillSpeed * 0.3f * Time.deltaTime;
+                reverseScoreSlider.value += fillSpeed * 0.3f * Time.deltaTime;
             }
         }
         

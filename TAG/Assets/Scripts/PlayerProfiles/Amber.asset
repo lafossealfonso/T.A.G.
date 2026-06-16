@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 126513082f66d7c4b8ab7d18a1803c33, type: 3}
   m_Name: Amber
   m_EditorClassIdentifier: 
-  playerName: 
-  playerColor: {r: 0, g: 0, b: 0, a: 0}
+  playerName: AMBER
+  playerColor: {r: 1, g: 0.6039734, b: 0, a: 1}
   playerSprite: {fileID: 0}
   isSprite: 0

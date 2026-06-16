@@ -1623,7 +1623,7 @@ MonoBehaviour:
   - {fileID: 0}
   joinedPlayers: []
   playerProfiles:
-  - {fileID: 11400000, guid: 90a1683e8a502d84aaae0d544815b86c, type: 2}
+  - {fileID: 11400000, guid: 5f1f634c27b95fe469e6b96e4c91d42e, type: 2}
   - {fileID: 11400000, guid: e1644d0eb698c6d45978f0afc3cbcc4c, type: 2}
   - {fileID: 11400000, guid: 9a91174d3d78d4f4f968738c82624dc6, type: 2}
   holdButton:
@@ -1651,6 +1651,7 @@ MonoBehaviour:
       m_Action: Hold Button
       m_Flags: 0
     m_Flags: 0
+  hasGameStarted: 0
   startSlider: {fileID: 7706872104456175060}
   startFillImage: {fileID: 7836806617909323476}
   startSliderFeedback: {fileID: 7999208985776408676}
