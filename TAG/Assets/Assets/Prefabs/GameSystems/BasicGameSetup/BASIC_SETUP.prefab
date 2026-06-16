@@ -7316,6 +7316,10 @@ PrefabInstance:
       value: MAGENTA
       objectReference: {fileID: 0}
     - target: {fileID: 7341257588045218041, guid: 80e71b9fc9221e944b87e4c47066adc8, type: 3}
+      propertyPath: playerProfiles.Array.size
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 7341257588045218041, guid: 80e71b9fc9221e944b87e4c47066adc8, type: 3}
       propertyPath: playerColors.Array.data[1].b
       value: 0.5000491
       objectReference: {fileID: 0}
@@ -7327,6 +7331,34 @@ PrefabInstance:
       propertyPath: playerColors.Array.data[1].r
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 7341257588045218041, guid: 80e71b9fc9221e944b87e4c47066adc8, type: 3}
+      propertyPath: 'playerProfiles.Array.data[0]'
+      value: 
+      objectReference: {fileID: 11400000, guid: c12884bc31deddb45bbb507f017c0659, type: 2}
+    - target: {fileID: 7341257588045218041, guid: 80e71b9fc9221e944b87e4c47066adc8, type: 3}
+      propertyPath: 'playerProfiles.Array.data[2]'
+      value: 
+      objectReference: {fileID: 11400000, guid: 8cb516281e8357b4ead76dd9cc4a7da7, type: 2}
+    - target: {fileID: 7341257588045218041, guid: 80e71b9fc9221e944b87e4c47066adc8, type: 3}
+      propertyPath: 'playerProfiles.Array.data[3]'
+      value: 
+      objectReference: {fileID: 11400000, guid: e72a5ea8ffba05c4ba79bcf6b9522cad, type: 2}
+    - target: {fileID: 7341257588045218041, guid: 80e71b9fc9221e944b87e4c47066adc8, type: 3}
+      propertyPath: 'playerProfiles.Array.data[4]'
+      value: 
+      objectReference: {fileID: 11400000, guid: 142c9d2c099784e49ac112a1f2eaeb01, type: 2}
+    - target: {fileID: 7341257588045218041, guid: 80e71b9fc9221e944b87e4c47066adc8, type: 3}
+      propertyPath: 'playerProfiles.Array.data[5]'
+      value: 
+      objectReference: {fileID: 11400000, guid: 532c272c5bdf748439fd276ccf35a329, type: 2}
+    - target: {fileID: 7341257588045218041, guid: 80e71b9fc9221e944b87e4c47066adc8, type: 3}
+      propertyPath: 'playerProfiles.Array.data[6]'
+      value: 
+      objectReference: {fileID: 11400000, guid: bd57dbf260a88874ead9ffa17bc62efb, type: 2}
+    - target: {fileID: 7341257588045218041, guid: 80e71b9fc9221e944b87e4c47066adc8, type: 3}
+      propertyPath: 'playerProfiles.Array.data[7]'
+      value: 
+      objectReference: {fileID: 11400000, guid: 9a91174d3d78d4f4f968738c82624dc6, type: 2}
     - target: {fileID: 7712345436852527775, guid: 80e71b9fc9221e944b87e4c47066adc8, type: 3}
       propertyPath: m_LocalPosition.x
       value: 750.6401

@@ -45,6 +45,8 @@ public class Basic_PlayerScoreCard : MonoBehaviour
             item.SetActive(true);
         }
 
+        decorSlider.value = 0;
+        timer = 0f;
         decorFill = true;
 
         scoreSlider.value = 0;
@@ -68,11 +70,25 @@ public class Basic_PlayerScoreCard : MonoBehaviour
 
     public void UpdateProfileCard(Color colour, string name)
     {
+
+        
+
         PlayerName.text = name;
         playerName = name;
         playerColor = colour;
         SetUIColor(colour);
         UpdateUI();
+
+        timer = 0f;
+        decorSlider.value = 0;
+        decorFill = true;
+        percentageText.color = colour;
+        foreach (Image image in recolorImageList) 
+        {
+            image.color = colour;
+        }
+
+        
 
     }
 
