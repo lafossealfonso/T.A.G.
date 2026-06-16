@@ -1,3 +1,4 @@
+using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -24,6 +25,8 @@ public class BackgroundSprite : MonoBehaviour
 
     private void Update()
     {
+        
+
         Vector2 mousePos = Mouse.current.position.ReadValue();
 
         Vector2 screenPos =
