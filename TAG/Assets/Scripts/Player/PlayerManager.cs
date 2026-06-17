@@ -82,6 +82,16 @@ public class PlayerManager : MonoBehaviour
         ShakeUI();
     }
 
+    public void ResetPlayerPositions()
+    {
+        for (int i = 0; i < players.Count; i++)
+        {
+            players[i].transform.position = spawnPoints[i].position;
+            PlayerMovement playerMovement = players[i].GetComponent<PlayerMovement>();
+            if (playerMovement != null) playerMovement.setIsIt(false);
+            scoreCards[i].ResetSliders();
+        }
+    }
     public void CycleProfile(PlayerInput player, int direction)
     {
         if (!selectedProfiles.ContainsKey(player))

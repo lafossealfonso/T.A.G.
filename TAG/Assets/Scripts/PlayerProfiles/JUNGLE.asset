@@ -10,9 +10,9 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 126513082f66d7c4b8ab7d18a1803c33, type: 3}
-  m_Name: GOLD
+  m_Name: JUNGLE
   m_EditorClassIdentifier: 
-  playerName: GOLD
-  playerColor: {r: 1, g: 0.8352941, b: 0, a: 1}
+  playerName: JUNGLE
+  playerColor: {r: 0.18039216, g: 0.6784314, b: 0.2901961, a: 1}
   playerSprite: {fileID: 0}
   isSprite: 0

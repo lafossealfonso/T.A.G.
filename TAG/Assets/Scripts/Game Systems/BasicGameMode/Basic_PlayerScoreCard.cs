@@ -18,7 +18,8 @@ public class Basic_PlayerScoreCard : MonoBehaviour
     bool decorFill = false;
 
     [SerializeField] Image fillSlideRenderer;
-    
+
+    public int playerScore = 0;
     
     [SerializeField] public float fillSpeed;
     [Header("Percentage")]
@@ -34,8 +35,7 @@ public class Basic_PlayerScoreCard : MonoBehaviour
     public string playerName;
     public Color playerColor;
     [SerializeField] MMF_Player feedbackPlayer;
-    bool feedbackStarted = false;
-    [SerializeField] private AnimationCurve intensityCurve;
+    //[SerializeField] private AnimationCurve intensityCurve;
 
 
     public void AssignPlayer(GameObject player, Color color, string name)
@@ -98,7 +98,7 @@ public class Basic_PlayerScoreCard : MonoBehaviour
         {
             item.SetActive(false);
         }
-        feedbackPlayer.FeedbacksIntensity = 0f;
+        
         decorSlider.value = 0f;
         decorFill = false;
     }
@@ -130,27 +130,9 @@ public class Basic_PlayerScoreCard : MonoBehaviour
         percentageText.text = Mathf.RoundToInt(scoreSlider.value).ToString() + "%";
 
         float normalizedTime = scoreSlider.value / scoreSlider.maxValue;
-        float curveValue = intensityCurve.Evaluate(normalizedTime);
+        //float curveValue = intensityCurve.Evaluate(normalizedTime);
 
-        // START
-        if (curveValue > 0f && !feedbackStarted)
-        {
-            feedbackPlayer.PlayFeedbacks();
-            feedbackStarted = true;
-        }
 
-        // STOP
-        if (curveValue <= 0f && feedbackStarted)
-        {
-            feedbackPlayer.StopFeedbacks();
-            feedbackStarted = false;
-        }
-
-        // UPDATE
-        if (feedbackStarted)
-        {
-            feedbackPlayer.FeedbacksIntensity = curveValue;
-        }
 
         if (playerIsAssigned)
         {
@@ -161,8 +143,11 @@ public class Basic_PlayerScoreCard : MonoBehaviour
 
                 if (scoreSlider.value >= scoreSlider.maxValue)
                 {
+                    
                     GameManager.Instance.WinnerEvent(assignedPlayer);
-
+                    
+                    
+                    
                 }
 
                 reverseScoreSlider.value -= fillSpeed * Time.deltaTime;
@@ -177,8 +162,16 @@ public class Basic_PlayerScoreCard : MonoBehaviour
         
     }
 
+    public void PlayIsItFeedback()
+    {
+        feedbackPlayer.PlayFeedbacks();
+    }
 
-
+    public void ResetSliders()
+    {
+        reverseScoreSlider.value = 100f;
+        scoreSlider.value = 0f;
+    }
     public bool IsAssignedTo(GameObject player)
     {
         return assignedPlayer == player;

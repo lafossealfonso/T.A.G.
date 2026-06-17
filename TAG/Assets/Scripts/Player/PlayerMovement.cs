@@ -1,4 +1,5 @@
 using System.Collections;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -207,7 +208,7 @@ public class PlayerMovement : MonoBehaviour
     {
         if (collision.gameObject.CompareTag("Star"))
         {
-            Destroy(collision.gameObject);
+            collision.gameObject.SetActive(false);
             //GameManager.Instance.RemoveFromCinemachineTargetGroup(collision.gameObject.transform);
             setIsIt(true);
             
@@ -221,6 +222,7 @@ public class PlayerMovement : MonoBehaviour
     {
         this.isIt = isIt;
         itIndicator.SetActive(isIt);
+        thisPlayerScoreCard.PlayIsItFeedback();
     }
 
     public bool returnIsIt()

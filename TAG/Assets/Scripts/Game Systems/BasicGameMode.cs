@@ -7,12 +7,18 @@ using TMPro;
 using Unity.Cinemachine;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public class BasicGameMode : MonoBehaviour
 {
     [SerializeField] MMF_Player startFadePlayer;
     public PlayerManager playerManager;
     public List<Transform> startPoints;
+    public Transform starTransform;
+    [Header("Score Settings")]
+    public float roundNumberLimit;
+    public int numberOfRoundsPlayed;
+    public List<Image> scoreKeepers;
     public Transform spawnPoint;
     public CinemachineCamera winnerCamera;
     [SerializeField] TextMeshProUGUI winnerDisplayName;
@@ -58,15 +64,38 @@ public class BasicGameMode : MonoBehaviour
 
     void WinnerSequence(GameObject player)
     {
-        PlayerManager.Instance.DisablePlayerMovement();
-        winnerCamera.Follow = player.gameObject.transform;
-        winnerCamera.gameObject.SetActive(true);
         PlayerMovement playerMovement = player.GetComponent<PlayerMovement>();
         Basic_PlayerScoreCard playerCard = playerMovement.thisPlayerScoreCard;
-        winnerDisplayName.text = playerCard.playerName;
-        winnerDisplayName.color = playerCard.playerColor;
-        winnerDisplayName.gameObject.transform.parent.gameObject.SetActive(true);
-        gameEnded = true;
+
+        playerCard.playerScore += 1;
+        numberOfRoundsPlayed += 1;
+        scoreKeepers[numberOfRoundsPlayed].color = playerCard.playerColor;
+
+        ResetLevelForNextRound();
+
+        if (playerCard.playerScore >= roundNumberLimit / 2)
+        {
+            PlayerManager.Instance.DisablePlayerMovement();
+            winnerCamera.Follow = player.gameObject.transform;
+            winnerCamera.gameObject.SetActive(true);
+
+
+            winnerDisplayName.text = playerCard.playerName;
+            winnerDisplayName.color = playerCard.playerColor;
+            winnerDisplayName.gameObject.transform.parent.gameObject.SetActive(true);
+            gameEnded = true;                    
+        }
+
+
+        
+    }
+
+
+
+    void ResetLevelForNextRound()
+    {
+        playerManager.ResetPlayerPositions();
+        starTransform.gameObject.SetActive(true);
     }
 
     void Update()
