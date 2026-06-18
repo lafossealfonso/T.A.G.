@@ -12,6 +12,11 @@ using UnityEngine.UI;
 public class BasicGameMode : MonoBehaviour
 {
     [SerializeField] MMF_Player startFadePlayer;
+    [Header("Round Transition Fade Settings")]
+    [SerializeField] MMF_Player roundFadePlayer;
+    [SerializeField] TextMeshProUGUI roundFadePlayerLabel;
+    [SerializeField] TextMeshProUGUI roundFadeCounter;
+    [SerializeField] Image roundFadeImage;
     public PlayerManager playerManager;
     public List<Transform> startPoints;
     public Transform starTransform;
@@ -45,7 +50,7 @@ public class BasicGameMode : MonoBehaviour
 
     private void Start()
     {
-        //startFadePlayer.PlayFeedbacks();
+        startFadePlayer.PlayFeedbacks();
         GameManager.Instance.playerTaggedEffectPlayer = feedbackPlayerTagged;
     }
 
@@ -69,7 +74,7 @@ public class BasicGameMode : MonoBehaviour
 
         playerCard.playerScore += 1;
         numberOfRoundsPlayed += 1;
-        scoreKeepers[numberOfRoundsPlayed].color = playerCard.playerColor;
+        scoreKeepers[numberOfRoundsPlayed - 1 ].color = playerCard.playerColor;
 
         ResetLevelForNextRound();
 
@@ -79,21 +84,18 @@ public class BasicGameMode : MonoBehaviour
             winnerCamera.Follow = player.gameObject.transform;
             winnerCamera.gameObject.SetActive(true);
 
-
             winnerDisplayName.text = playerCard.playerName;
             winnerDisplayName.color = playerCard.playerColor;
             winnerDisplayName.gameObject.transform.parent.gameObject.SetActive(true);
             gameEnded = true;                    
         }
-
-
-        
     }
 
 
 
     void ResetLevelForNextRound()
     {
+        roundFadePlayer.PlayFeedbacks();
         playerManager.ResetPlayerPositions();
         starTransform.gameObject.SetActive(true);
     }

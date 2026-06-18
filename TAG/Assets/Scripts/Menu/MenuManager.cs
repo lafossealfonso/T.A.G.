@@ -13,6 +13,7 @@ public class MenuManager : MonoBehaviour
 {
     public MMF_Player transitionPlayer;
     [SerializeField] List<MMF_Player> feedbackPlayOnStart;
+    public GameObject decorSpiral;
 
     public GameObject currentMenu;
 
@@ -58,6 +59,8 @@ public class MenuManager : MonoBehaviour
 
     public void TurnMaskOn(bool mask)
     {
+        decorSpiral.SetActive(!mask);
+
         if (mask)
         {
             Vector3 pos = maskTransform.position;

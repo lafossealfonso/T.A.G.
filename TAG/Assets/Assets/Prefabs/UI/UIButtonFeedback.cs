@@ -8,22 +8,23 @@ public class UIButtonFeedback : MonoBehaviour, IPointerEnterHandler, IPointerExi
 
     [SerializeField] MMF_Player onHoverFeedbackPlayer;
     [SerializeField] MMF_Player onExitFeedbackPlayer;
+    [SerializeField] MMF_Player rotatingDecorPlayer;
     [SerializeField] LevelDisplay levelDisplayScript;
     [SerializeField] int thisIndexInt = 0;
     [SerializeField] bool displaylevel = false;
     public void OnPointerEnter(PointerEventData eventData)
     {
-        HoverEnter();
+        //HoverEnter();
     }
 
     public void OnPointerExit(PointerEventData eventData) 
     {
-        HoverExit();
+        //HoverExit();
     }
 
     public void OnPointerUp(PointerEventData eventData)
     {
-        HoverExit();
+        //HoverExit();
     }
 
     public void OnSubmit(BaseEventData eventData)
@@ -45,6 +46,7 @@ public class UIButtonFeedback : MonoBehaviour, IPointerEnterHandler, IPointerExi
     {
         onHoverFeedbackPlayer.PlayFeedbacks();
         if(displaylevel) levelDisplayScript.SetIndexTo(thisIndexInt);
+        rotatingDecorPlayer.PlayFeedbacks();
     }
 
     public void HoverExit()
