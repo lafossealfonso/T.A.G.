@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using TMPro;
 using Unity.Cinemachine;
 using UnityEngine;
+using UnityEngine.InputSystem.Controls;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
@@ -14,9 +15,11 @@ public class BasicGameMode : MonoBehaviour
     [SerializeField] MMF_Player startFadePlayer;
     [Header("Round Transition Fade Settings")]
     [SerializeField] MMF_Player roundFadePlayer;
+    [SerializeField] MMF_Player roundReverseFadePlayer;
     [SerializeField] TextMeshProUGUI roundFadePlayerLabel;
     [SerializeField] TextMeshProUGUI roundFadeCounter;
     [SerializeField] Image roundFadeImage;
+    [SerializeField] bool roundFadeActive = false;
     public PlayerManager playerManager;
     public List<Transform> startPoints;
     public Transform starTransform;
@@ -76,6 +79,11 @@ public class BasicGameMode : MonoBehaviour
         numberOfRoundsPlayed += 1;
         scoreKeepers[numberOfRoundsPlayed - 1 ].color = playerCard.playerColor;
 
+        roundFadePlayerLabel.text = playerCard.playerName;
+        roundFadeCounter.text = numberOfRoundsPlayed.ToString();
+
+
+
         ResetLevelForNextRound();
 
         if (playerCard.playerScore >= roundNumberLimit / 2)
@@ -96,24 +104,34 @@ public class BasicGameMode : MonoBehaviour
     void ResetLevelForNextRound()
     {
         roundFadePlayer.PlayFeedbacks();
+        roundFadeActive = true;
         playerManager.ResetPlayerPositions();
         starTransform.gameObject.SetActive(true);
     }
 
     void Update()
     {
-        if (gameEnded == false) return;
-
+        
         bool spacePressed = UnityEngine.InputSystem.Keyboard.current.spaceKey.wasPressedThisFrame;
 
         bool controllerPressed =
             UnityEngine.InputSystem.Gamepad.current != null &&
             UnityEngine.InputSystem.Gamepad.current.buttonNorth.wasPressedThisFrame;
 
+        if (roundFadeActive == true && (spacePressed || controllerPressed))
+        {
+            roundReverseFadePlayer.PlayFeedbacks();
+            roundFadeActive = false;
+        }
+
+        if (gameEnded == false) return;
+
         if (spacePressed || controllerPressed)
         {
             Reload();
         }
+
+        
     }
 
     public void Reload()
