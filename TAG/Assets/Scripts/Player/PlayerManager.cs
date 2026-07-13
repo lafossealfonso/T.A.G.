@@ -128,8 +128,10 @@ public class PlayerManager : MonoBehaviour
     }
     public void StartGame()
     {
+        MMF_Player menuParentFeedbackPLayer = menuParent.GetComponent<MMF_Player>();
+        if(menuParentFeedbackPLayer != null) menuParentFeedbackPLayer.PlayFeedbacks();
         SetPlayerCanMove(true);
-        menuParent.SetActive(false);
+        
         playerInputManager.DisableJoining();
     }
 

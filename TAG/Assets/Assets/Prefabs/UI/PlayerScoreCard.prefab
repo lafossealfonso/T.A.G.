@@ -723,6 +723,7 @@ MonoBehaviour:
     m_RotationOrder: 4
   duration: 3
   fillSlideRenderer: {fileID: 1907203726722093754}
+  playerScore: 0
   fillSpeed: 2
   percentageText: {fileID: 2739019444850996230}
   percentageImage: {fileID: 9127259146020940071}
@@ -736,12 +737,6 @@ MonoBehaviour:
   playerName: 
   playerColor: {r: 0, g: 0, b: 0, a: 0}
   feedbackPlayer: {fileID: 4288763380770016171}
-  intensityCurve:
-    serializedVersion: 2
-    m_Curve: []
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
 --- !u!114 &4288763380770016171
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1996,7 +1991,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0.3509434, g: 0.3509434, b: 0.3509434, a: 0.6156863}
+  m_Color: {r: 0.32156864, g: 0.32156864, b: 0.32156864, a: 0.36862746}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1

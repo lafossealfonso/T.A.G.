@@ -78,6 +78,8 @@ public class BasicGameMode : MonoBehaviour
 
         playerCard.playerScore += 1;
         numberOfRoundsPlayed += 1;
+        MMF_Player scorePlayer = scoreKeepers[numberOfRoundsPlayed - 1].gameObject.GetComponent<MMF_Player>();
+        if (scorePlayer != null) scorePlayer.PlayFeedbacks();
         scoreKeepers[numberOfRoundsPlayed - 1 ].color = playerCard.playerColor;
 
         roundFadePlayerLabel.text = playerCard.playerName;

@@ -678,7 +678,7 @@ MonoBehaviour:
   m_ChildAlignment: 4
   m_StartCorner: 0
   m_StartAxis: 0
-  m_CellSize: {x: 78.11, y: 823.6}
+  m_CellSize: {x: 243.7, y: 823.6}
   m_Spacing: {x: 1386, y: 109}
   m_Constraint: 2
   m_ConstraintCount: 2
@@ -1973,9 +1973,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   startFadePlayer: {fileID: 5790866040191930265}
   roundFadePlayer: {fileID: 0}
+  roundReverseFadePlayer: {fileID: 0}
   roundFadePlayerLabel: {fileID: 0}
   roundFadeCounter: {fileID: 0}
   roundFadeImage: {fileID: 0}
+  roundFadeActive: 0
   playerManager: {fileID: 0}
   startPoints: []
   starTransform: {fileID: 0}
