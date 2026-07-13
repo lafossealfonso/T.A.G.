@@ -128,10 +128,7 @@ public class PlayerManager : MonoBehaviour
     }
     public void StartGame()
     {
-        foreach (PlayerInput player in players) 
-        {
-            player.GetComponent<PlayerMovement>().canMove = true;
-        }
+        SetPlayerCanMove(true);
         menuParent.SetActive(false);
         playerInputManager.DisableJoining();
     }
@@ -302,5 +299,13 @@ public class PlayerManager : MonoBehaviour
     void ShakeUI()
     {
         startSliderFeedback.PlayFeedbacks();
+    }
+
+    public void SetPlayerCanMove(bool canMove) 
+    {
+        foreach (PlayerInput player in players)
+        {
+            player.GetComponent<PlayerMovement>().canMove = canMove;
+        }
     }
 }

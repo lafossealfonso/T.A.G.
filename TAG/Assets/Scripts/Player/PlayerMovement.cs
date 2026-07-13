@@ -109,6 +109,11 @@ public class PlayerMovement : MonoBehaviour
             moveInput.y * moveSpeed
         ) + rb.linearVelocity * 0.9f;
         }
+
+        if(canMove == false)
+        {
+            rb.linearVelocity = new Vector2(0f,0f);
+        }
     }
 
     private void RotateDirection()

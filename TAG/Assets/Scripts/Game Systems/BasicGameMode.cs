@@ -72,6 +72,7 @@ public class BasicGameMode : MonoBehaviour
 
     void WinnerSequence(GameObject player)
     {
+        playerManager.SetPlayerCanMove(false);
         PlayerMovement playerMovement = player.GetComponent<PlayerMovement>();
         Basic_PlayerScoreCard playerCard = playerMovement.thisPlayerScoreCard;
 
@@ -103,10 +104,12 @@ public class BasicGameMode : MonoBehaviour
 
     void ResetLevelForNextRound()
     {
+        playerManager.SetPlayerCanMove(false);
         roundFadePlayer.PlayFeedbacks();
         roundFadeActive = true;
         playerManager.ResetPlayerPositions();
         starTransform.gameObject.SetActive(true);
+        
     }
 
     void Update()
