@@ -92,12 +92,14 @@ public class BasicGameMode : MonoBehaviour
         if (playerCard.playerScore >= roundNumberLimit / 2)
         {
             PlayerManager.Instance.DisablePlayerMovement();
-            winnerCamera.Follow = player.gameObject.transform;
-            winnerCamera.gameObject.SetActive(true);
+            roundFadePlayer.PlayFeedbacks();
+            roundFadeActive = true;
+            //winnerCamera.Follow = player.gameObject.transform;
+            //winnerCamera.gameObject.SetActive(true);
 
-            winnerDisplayName.text = playerCard.playerName;
-            winnerDisplayName.color = playerCard.playerColor;
-            winnerDisplayName.gameObject.transform.parent.gameObject.SetActive(true);
+            // winnerDisplayName.text = playerCard.playerName;
+            //winnerDisplayName.color = playerCard.playerColor;
+            //winnerDisplayName.gameObject.transform.parent.gameObject.SetActive(true);
             gameEnded = true;                    
         }
     }
@@ -106,12 +108,12 @@ public class BasicGameMode : MonoBehaviour
 
     void ResetLevelForNextRound()
     {
-        playerManager.SetPlayerCanMove(false);
-        roundFadePlayer.PlayFeedbacks();
-        roundFadeActive = true;
+        
+        
         playerManager.ResetPlayerPositions();
         starTransform.gameObject.SetActive(true);
-        
+        playerManager.SetPlayerCanMove(true);
+
     }
 
     void Update()
