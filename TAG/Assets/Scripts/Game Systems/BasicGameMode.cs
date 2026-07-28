@@ -17,7 +17,6 @@ public class BasicGameMode : MonoBehaviour
     [SerializeField] MMF_Player roundFadePlayer;
     [SerializeField] MMF_Player roundReverseFadePlayer;
     [SerializeField] TextMeshProUGUI roundFadePlayerLabel;
-    [SerializeField] TextMeshProUGUI roundFadeCounter;
     [SerializeField] Image roundFadeImage;
     [SerializeField] bool roundFadeActive = false;
     public PlayerManager playerManager;
@@ -83,7 +82,7 @@ public class BasicGameMode : MonoBehaviour
         scoreKeepers[numberOfRoundsPlayed - 1 ].color = playerCard.playerColor;
 
         roundFadePlayerLabel.text = playerCard.playerName;
-        roundFadeCounter.text = numberOfRoundsPlayed.ToString();
+        
 
 
 
@@ -127,8 +126,8 @@ public class BasicGameMode : MonoBehaviour
 
         if (roundFadeActive == true && (spacePressed || controllerPressed))
         {
-            roundReverseFadePlayer.PlayFeedbacks();
-            roundFadeActive = false;
+            //roundReverseFadePlayer.PlayFeedbacks();
+            //roundFadeActive = false;
         }
 
         if (gameEnded == false) return;

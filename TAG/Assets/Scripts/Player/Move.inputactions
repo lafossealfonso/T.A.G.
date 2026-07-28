@@ -201,7 +201,7 @@
                 {
                     "name": "",
                     "id": "80d98b81-ac93-420a-b23c-f2dacf455034",
-                    "path": "<Gamepad>/start",
+                    "path": "<Gamepad>/buttonSouth",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
