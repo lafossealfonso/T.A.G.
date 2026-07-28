@@ -80,6 +80,7 @@ public class PlayerManager : MonoBehaviour
             playerProfiles[playerIndex]);
 
         ShakeUI();
+
     }
 
     public void ResetPlayerPositions()
@@ -108,7 +109,7 @@ public class PlayerManager : MonoBehaviour
             {
                 selectedProfiles[player] = next;
 
-                ApplyProfile(player, next); // 🔥 everything updates here
+                ApplyProfile(player, next); 
                 return;
             }
         }
@@ -269,7 +270,7 @@ public class PlayerManager : MonoBehaviour
 
         if (holdingCount > 0)
         {
-            float baseSpeed = 0.3f;
+            float baseSpeed = 0.75f;
             float speedMultiplier = Mathf.Pow(2f, holdingCount - 1);
 
             startSlider.value += baseSpeed * speedMultiplier * Time.deltaTime;
