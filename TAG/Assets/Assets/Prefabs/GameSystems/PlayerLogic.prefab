@@ -1626,6 +1626,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 5f1f634c27b95fe469e6b96e4c91d42e, type: 2}
   - {fileID: 11400000, guid: e1644d0eb698c6d45978f0afc3cbcc4c, type: 2}
   - {fileID: 11400000, guid: 9a91174d3d78d4f4f968738c82624dc6, type: 2}
+  basicGameModeScript: {fileID: 0}
   holdButton:
     m_Name: Hold Button
     m_Type: 0
@@ -1656,6 +1657,7 @@ MonoBehaviour:
   startFillImage: {fileID: 7836806617909323476}
   startSliderFeedback: {fileID: 7999208985776408676}
   defaultPlayerSprite: {fileID: 7482667652216324306, guid: 311925a002f4447b3a28927169b83ea6, type: 3}
+  playerTestMode: 0
 --- !u!114 &8254429214906462570
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1901,6 +1903,10 @@ PrefabInstance:
       propertyPath: m_AnchoredPosition.x
       value: 0.00079345703
       objectReference: {fileID: 0}
+    - target: {fileID: 3863847546901177060, guid: f142968fe0028ec4cb41f8b014fbaf27, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 4227378764594446281, guid: f142968fe0028ec4cb41f8b014fbaf27, type: 3}
       propertyPath: m_Name
       value: Player1 (1)
@@ -2120,6 +2126,10 @@ PrefabInstance:
       propertyPath: m_AnchoredPosition.y
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 3863847546901177060, guid: f142968fe0028ec4cb41f8b014fbaf27, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 4227378764594446281, guid: f142968fe0028ec4cb41f8b014fbaf27, type: 3}
       propertyPath: m_Name
       value: Player1
@@ -2330,6 +2340,10 @@ PrefabInstance:
     - target: {fileID: 3561631773393875887, guid: f142968fe0028ec4cb41f8b014fbaf27, type: 3}
       propertyPath: m_AnchoredPosition.x
       value: 0.00079345703
+      objectReference: {fileID: 0}
+    - target: {fileID: 3863847546901177060, guid: f142968fe0028ec4cb41f8b014fbaf27, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 4227378764594446281, guid: f142968fe0028ec4cb41f8b014fbaf27, type: 3}
       propertyPath: m_Name

@@ -62,13 +62,13 @@ public class PlayerMovement : MonoBehaviour
     new GradientColorKey[]
     {
         new GradientColorKey(color, 0.0f),
-        new GradientColorKey(color, 1.0f)
+        new GradientColorKey(Color.white, 1.0f)
     },
     new GradientAlphaKey[]
     {
-        new GradientAlphaKey(0.6f, 0.0f), // fully visible at start
-        new GradientAlphaKey(0.6f, 0.4f), // fully visible at start
-        new GradientAlphaKey(0.0f, 1.0f)  // fully transparent at end
+        new GradientAlphaKey(1f, 0.0f), // fully visible at start
+        new GradientAlphaKey(1f, 0.4f), // fully visible at start
+        new GradientAlphaKey(1f, 1.0f)  // fully transparent at end
     }
 );
         trail.colorGradient = gradient;
@@ -235,4 +235,6 @@ public class PlayerMovement : MonoBehaviour
         return isIt;
     }
     //-----------------------------------------------
+
+    
 }

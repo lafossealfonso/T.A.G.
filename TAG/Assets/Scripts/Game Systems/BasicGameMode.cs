@@ -18,6 +18,9 @@ public class BasicGameMode : MonoBehaviour
     [SerializeField] MMF_Player roundReverseFadePlayer;
     [SerializeField] TextMeshProUGUI roundFadePlayerLabel;
     [SerializeField] Image roundFadeImage;
+    [SerializeField] Image roundFadeIconSML;
+    [SerializeField] Image roundFadeIconMED;
+    [SerializeField] Image roundFadeIconLRG;
     [SerializeField] bool roundFadeActive = false;
     public PlayerManager playerManager;
     public List<Transform> startPoints;
@@ -25,6 +28,9 @@ public class BasicGameMode : MonoBehaviour
     [Header("Score Settings")]
     public float roundNumberLimit;
     public int numberOfRoundsPlayed;
+    public GameObject scoreKeeperPrefab;
+    public GameObject scoreKeeperParentA;
+    public GameObject scoreKeeperParentB;
     public List<Image> scoreKeepers;
     public Transform spawnPoint;
     public CinemachineCamera winnerCamera;
@@ -90,6 +96,10 @@ public class BasicGameMode : MonoBehaviour
 
         if (playerCard.playerScore >= roundNumberLimit / 2)
         {
+            roundFadePlayerLabel.color = playerCard.playerColor;
+            roundFadeIconSML.color = playerCard.playerColor * 0.55f;
+            roundFadeIconMED.color = playerCard.playerColor * 0.9f;
+            roundFadeIconLRG.color = playerCard.playerColor * 0.7f;
             PlayerManager.Instance.DisablePlayerMovement();
             roundFadePlayer.PlayFeedbacks();
             roundFadeActive = true;
@@ -122,7 +132,7 @@ public class BasicGameMode : MonoBehaviour
 
         bool controllerPressed =
             UnityEngine.InputSystem.Gamepad.current != null &&
-            UnityEngine.InputSystem.Gamepad.current.buttonNorth.wasPressedThisFrame;
+            UnityEngine.InputSystem.Gamepad.current.buttonSouth.wasPressedThisFrame;
 
         if (roundFadeActive == true && (spacePressed || controllerPressed))
         {
@@ -158,5 +168,25 @@ public class BasicGameMode : MonoBehaviour
         yield return null;
 
         startFadePlayer.PlayFeedbacks();
+    }
+
+    public void PlayerHasJoined()
+    {
+        if (scoreKeeperParentA.transform.childCount >= 3)
+        {
+            GameObject scoreKeeperB = Instantiate(scoreKeeperPrefab, scoreKeeperParentB.transform);
+            Image scoreKeeperImageB = scoreKeeperB.GetComponent<Image>();
+            scoreKeepers.Add(scoreKeeperImageB);
+        }
+
+        else
+        {
+            GameObject scoreKeeperA = Instantiate(scoreKeeperPrefab, scoreKeeperParentA.transform);
+            Image scoreKeeperImageA = scoreKeeperA.GetComponent<Image>();
+            scoreKeepers.Add(scoreKeeperImageA);
+        }
+
+        
+        
     }
 }

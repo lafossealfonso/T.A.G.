@@ -19,8 +19,10 @@ public class PlayerManager : MonoBehaviour
     [SerializeField] public List<Basic_PlayerScoreCard> scoreCards;
     [SerializeField] List<GameObject> joinedPlayers = new List<GameObject>();
     [SerializeField] List<PlayerProfile> playerProfiles;
+    [SerializeField] BasicGameMode basicGameModeScript;
     private Dictionary<PlayerInput, int> selectedProfiles = new();
     private Dictionary<PlayerInput, float> profileInputCooldown = new();
+    [SerializeField] float multiplayerFillSpeedMultiplier = 1.5f;
     public InputAction holdButton;
     public bool hasGameStarted = false;
     [SerializeField] Slider startSlider;
@@ -28,6 +30,7 @@ public class PlayerManager : MonoBehaviour
     private PlayerInput lastPlayerToHold;
     public MMF_Player startSliderFeedback;
     public Sprite defaultPlayerSprite;
+    public bool playerTestMode;
 
     private void Awake()
     {
@@ -80,6 +83,16 @@ public class PlayerManager : MonoBehaviour
             playerProfiles[playerIndex]);
 
         ShakeUI();
+
+        basicGameModeScript.PlayerHasJoined();
+
+        foreach(Basic_PlayerScoreCard scoreCard in scoreCards)
+        {
+            if(players.Count > 2)
+            {
+                scoreCard.fillSpeed *= multiplayerFillSpeedMultiplier;
+            }
+        }
 
     }
 
@@ -212,6 +225,12 @@ public class PlayerManager : MonoBehaviour
         {
             HandleProfileSelection();
         }
+
+        if (Keyboard.current.uKey.wasPressedThisFrame ||
+        Gamepad.current?.rightShoulder.wasPressedThisFrame == true)
+        {
+            SetPlayerTestMode();
+        }
     }
 
     private void HandleProfileSelection()
@@ -309,6 +328,29 @@ public class PlayerManager : MonoBehaviour
         foreach (PlayerInput player in players)
         {
             player.GetComponent<PlayerMovement>().canMove = canMove;
+        }
+    }
+
+    public void SetPlayerTestMode()
+    {
+        if (playerTestMode == false)
+        {
+            foreach(Basic_PlayerScoreCard basic_PlayerScoreCard in scoreCards)
+            {
+                basic_PlayerScoreCard.fillSpeed = 33f;
+            }
+
+            playerTestMode = true;
+        }
+
+        else
+        {
+            foreach (Basic_PlayerScoreCard basic_PlayerScoreCard in scoreCards)
+            {
+                basic_PlayerScoreCard.fillSpeed = 3f;
+            }
+
+            playerTestMode = false;
         }
     }
 }

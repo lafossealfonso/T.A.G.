@@ -10,9 +10,9 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 126513082f66d7c4b8ab7d18a1803c33, type: 3}
-  m_Name: SHOCK
+  m_Name: WARNED
   m_EditorClassIdentifier: 
-  playerName: SHOCK
-  playerColor: {r: 0.6408901, g: 0, b: 1, a: 1}
+  playerName: WARNED
+  playerColor: {r: 1, g: 0.3372549, b: 0, a: 1}
   playerSprite: {fileID: 0}
   isSprite: 0
