@@ -5,6 +5,8 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine.UI;
 using MoreMountains.Feedbacks;
+using HardLight2DUtil;
+using Unity.VisualScripting;
 
 
 public class PlayerManager : MonoBehaviour
@@ -31,6 +33,9 @@ public class PlayerManager : MonoBehaviour
     public MMF_Player startSliderFeedback;
     public Sprite defaultPlayerSprite;
     public bool playerTestMode;
+
+    [Header("Light Settins")]
+    public bool levelUsingLights = false;
 
     private void Awake()
     {
@@ -92,6 +97,12 @@ public class PlayerManager : MonoBehaviour
             {
                 scoreCard.fillSpeed *= multiplayerFillSpeedMultiplier;
             }
+        }
+
+        if(levelUsingLights == true)
+        {
+            BoxCollider2D playerCollider = player.gameObject.GetComponent<BoxCollider2D>();
+            HardLight2DManager.RefreshColliderReference(playerCollider);
         }
 
     }

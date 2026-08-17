@@ -27,6 +27,7 @@ public class PlayerMovement : MonoBehaviour
     public SpriteRenderer directionIndicator;
     public GameObject itIndicator;
     public TrailRenderer trail;
+    public HardLight2D lightObject;
 
     public Basic_PlayerScoreCard thisPlayerScoreCard;
     public PlayerMenuCard thisPlayerMenuCard;
@@ -54,6 +55,7 @@ public class PlayerMovement : MonoBehaviour
 
     public void SetPlayerVisualColour(Color color)
     {
+        lightObject.Color = color;
         playerVisual.color = color;
         directionIndicator.color = Color.Lerp(color, Color.white, 0.6f);
         Gradient gradient = new Gradient();
