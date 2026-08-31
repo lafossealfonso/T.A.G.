@@ -112,6 +112,8 @@ public class NetworkedPlayerMovement : NetworkBehaviour
 
         nextTagRequestTime = Time.time + localTagRequestCooldown;
 
+        Debug.Log($"[Tag] Requesting tag: I am client {NetworkManager.Singleton.LocalClientId}, targeting client {otherNetworkObject.OwnerClientId}");
+
         playerData.RequestTagServerRpc(otherNetworkObject.OwnerClientId);
     }
 }
