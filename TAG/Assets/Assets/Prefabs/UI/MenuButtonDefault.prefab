@@ -1166,6 +1166,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   onHoverFeedbackPlayer: {fileID: 2600749559890274600}
   onExitFeedbackPlayer: {fileID: 1872325197174659901}
+  rotatingDecorPlayer: {fileID: 0}
   levelDisplayScript: {fileID: 0}
   thisIndexInt: 0
   displaylevel: 0
@@ -1359,14 +1360,14 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 24
-  m_fontSizeBase: 24
+  m_fontSize: 18.96
+  m_fontSizeBase: 18.96
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
   m_fontSizeMax: 72
-  m_fontStyle: 0
-  m_HorizontalAlignment: 1
+  m_fontStyle: 8
+  m_HorizontalAlignment: 2
   m_VerticalAlignment: 512
   m_textAlignment: 65535
   m_characterSpacing: 0

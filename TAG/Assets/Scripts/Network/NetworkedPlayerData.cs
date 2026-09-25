@@ -29,6 +29,11 @@ public class NetworkedPlayerData : NetworkBehaviour
         NetworkVariableReadPermission.Everyone,
         NetworkVariableWritePermission.Server);
 
+    public NetworkVariable<bool> isReady = new NetworkVariable<bool>(
+        false,
+        NetworkVariableReadPermission.Everyone,
+        NetworkVariableWritePermission.Server);
+
     [Header("Visual References (mirrors old PlayerMovement fields)")]
     [SerializeField] private GameObject itIndicator;
 
@@ -74,15 +79,20 @@ public class NetworkedPlayerData : NetworkBehaviour
         if (slotIndex.Value < 0) return;
         if (NetworkedPlayerManager.Instance == null) return;
 
-        NetworkedScoreCardUI slot = NetworkedPlayerManager.Instance.GetScoreCardSlot(slotIndex.Value);
-        if (slot == null) return;
-
-        OnlineBasic_PlayerScoreCard scoreCard = GetComponent<OnlineBasic_PlayerScoreCard>();
-        if (scoreCard == null) return;
-
         PlayerProfile profile = NetworkedPlayerManager.Instance.GetProfile(profileIndex.Value);
 
-        slot.BindToPlayer(scoreCard, profile);
+        NetworkedScoreCardUI scoreSlot = NetworkedPlayerManager.Instance.GetScoreCardSlot(slotIndex.Value);
+        if (scoreSlot != null)
+        {
+            OnlineBasic_PlayerScoreCard scoreCard = GetComponent<OnlineBasic_PlayerScoreCard>();
+            if (scoreCard != null) scoreSlot.BindToPlayer(scoreCard, profile);
+        }
+
+        //NetworkedReadyUI readySlot = NetworkedPlayerManager.Instance.GetReadyUISlot(slotIndex.Value);
+        //if (readySlot != null)
+        //{
+        //    readySlot.BindToPlayer(this, profile);
+        //}
     }
     // --- Server-only setters -------------------------------------------
 
@@ -108,6 +118,12 @@ public class NetworkedPlayerData : NetworkBehaviour
     {
         if (!IsServer) return;
         slotIndex.Value = index;
+    }
+
+    public void ServerSetReady(bool value)
+    {
+        if(!IsServer) return;
+        isReady.Value = value;
     }
 
     // --- Tagging -----------------------------------------------------------
@@ -180,5 +196,15 @@ public class NetworkedPlayerData : NetworkBehaviour
     public void ServerStartTagCooldown()
     {
         tagCooldownEndTime = Time.time + TagCooldownDuration;
+    }
+
+    [ServerRpc]
+    public void RequestReadyServerRpc()
+    {
+        // Ignore repeat presses -- once ready, stays ready (one-directional for now)
+        if (isReady.Value) return;
+
+        ServerSetReady(true);
+        //NetworkedPlayerManager.Instance?.ServerNotifyPlayerReady(OwnerClientId);
     }
 }

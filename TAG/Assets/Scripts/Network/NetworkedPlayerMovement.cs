@@ -16,6 +16,10 @@ public class NetworkedPlayerMovement : NetworkBehaviour
     [Tooltip("Drag the 'Move' action from Move.inputactions here.")]
     [SerializeField] private InputActionReference moveAction;
 
+    [Header("Ready Input")]
+    [Tooltip("Drag the 'StartGame' or 'Hold' action from Move.inputactions here.")]
+    [SerializeField] private InputActionReference readyAction;
+
     private Rigidbody2D rb;
     private NetworkedPlayerData playerData;
     private Vector2 moveInput;
@@ -28,12 +32,12 @@ public class NetworkedPlayerMovement : NetworkBehaviour
 
     public override void OnNetworkSpawn()
     {
-        // Only enable input reading on the machine that owns this object.
-        // Every other client just sees this object's transform sync in via
-        // NetworkTransform -- they never read input for it.
+        
         if (IsOwner)
         {
             moveAction.action.Enable();
+            readyAction.action.Enable();
+            readyAction.action.performed += OnReadyPerformed;
         }
     }
 
@@ -42,6 +46,8 @@ public class NetworkedPlayerMovement : NetworkBehaviour
         if (IsOwner)
         {
             moveAction.action.Disable();
+            readyAction.action.Disable();
+            readyAction.action.performed -= OnReadyPerformed;
         }
     }
 
@@ -87,6 +93,11 @@ public class NetworkedPlayerMovement : NetworkBehaviour
             transform.rotation, targetRotation, rotationSpeed * Time.deltaTime);
     }
 
+    private void OnReadyPerformed(InputAction.CallbackContext context)
+    {
+        playerData.RequestReadyServerRpc();
+    }
+
     // --- Tagging ---------------------------------------------------------
     //Client detects locally first
 
@@ -96,24 +107,14 @@ public class NetworkedPlayerMovement : NetworkBehaviour
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        Debug.Log("Collision Detected");
         if (!IsOwner) return;
-        Debug.Log("Is Owner");
         if (Time.time < nextTagRequestTime) return;
-        Debug.Log("Next Tag not available");
         if (!collision.gameObject.CompareTag("Player")) return;
-        Debug.Log("IsPLayerCollision");
 
-        NetworkObject otherNetworkObject = collision.gameObject.GetComponent<NetworkObject>();
-        NetworkedPlayerData otherPlayerData = collision.gameObject.GetComponent<NetworkedPlayerData>();
-        if (otherNetworkObject == null || otherPlayerData == null) return;
-
-        if (!otherPlayerData.isIt.Value || playerData.isIt.Value) return;
+        NetworkObject otherNetworkObject = collision.gameObject.GetComponentInParent<NetworkObject>();
+        if (otherNetworkObject == null) return;
 
         nextTagRequestTime = Time.time + localTagRequestCooldown;
-
-        Debug.Log($"[Tag] Requesting tag: I am client {NetworkManager.Singleton.LocalClientId}, targeting client {otherNetworkObject.OwnerClientId}");
-
         playerData.RequestTagServerRpc(otherNetworkObject.OwnerClientId);
     }
 }

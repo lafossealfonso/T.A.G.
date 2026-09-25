@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 7817849230203491317}
   - component: {fileID: 8574072599024640298}
   - component: {fileID: 7999473219502483500}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: ThickWall
   m_TagString: Untagged
   m_Icon: {fileID: 0}

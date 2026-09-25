@@ -25,6 +25,7 @@ public class PlayerMovement : MonoBehaviour
 
     public SpriteRenderer playerVisual;
     public SpriteRenderer directionIndicator;
+    public SpriteRenderer teleportingVisual;
     public GameObject itIndicator;
     public TrailRenderer trail;
     public HardLight2D lightObject;
@@ -147,6 +148,62 @@ public class PlayerMovement : MonoBehaviour
         yield return new WaitForSeconds(0.3f);
 
         GetComponent<Collider2D>().enabled = true;
+    }
+    //-----------------------------------------------
+    [SerializeField] private float exitSnapDuration = 0.1f;
+
+    public void TeleportAlongLine(Vector2 lineStart, Vector2 lineEnd, Vector2 exitPosition, float duration, Color color)
+    {
+        StartCoroutine(TeleportAlongLineRoutine(lineStart, lineEnd, exitPosition, duration, color));
+    }
+
+    private IEnumerator TeleportAlongLineRoutine(Vector2 lineStart, Vector2 lineEnd, Vector2 exitPosition, float duration, Color color)
+    {
+        bool wasCanMove = canMove;
+        SetTeleportVisual(true, color);
+        canMove = false;
+        rb.linearVelocity = Vector2.zero;
+
+        Collider2D col = GetComponent<Collider2D>();
+        col.enabled = false;
+
+        // Snap onto the portal line at the point of entry
+        rb.MovePosition(lineStart);
+
+        // Phase 1: ride the beam from this portal to the linked one
+        yield return LerpAlong(lineStart, lineEnd, duration);
+
+        // Phase 2: settle into the correct spot on the far side
+        yield return LerpAlong(lineEnd, exitPosition, exitSnapDuration);
+
+        col.enabled = true;
+        canMove = wasCanMove;
+        SetTeleportVisual(false, color);
+    }
+
+    private IEnumerator LerpAlong(Vector2 from, Vector2 to, float duration)
+    {
+        float elapsed = 0f;
+
+        while (elapsed < duration)
+        {
+            elapsed += Time.deltaTime;
+            float t = Mathf.Clamp01(elapsed / duration);
+            rb.MovePosition(Vector2.Lerp(from, to, t));
+            yield return null;
+        }
+
+        rb.MovePosition(to);
+    }
+
+    public void SetTeleportVisual(bool isTeleporting, Color color)
+    {
+        playerVisual.enabled = !isTeleporting;
+        directionIndicator.enabled = !isTeleporting;
+        GetComponent<Collider2D>().enabled = !isTeleporting;
+        lightObject.gameObject.SetActive(isTeleporting);
+        teleportingVisual.color = color;
+        teleportingVisual.enabled = isTeleporting;
     }
     //-----------------------------------------------
     public void BoostPad()
