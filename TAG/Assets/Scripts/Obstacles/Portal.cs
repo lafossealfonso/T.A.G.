@@ -20,9 +20,14 @@ public class Portal : MonoBehaviour
     [SerializeField] private Color lineRendererColor;
     private readonly List<LineRenderer> spawnedLines = new();
 
+    [SerializeField] bool inMenu = false;
+
     private void Start()
     {
-        DrawPortalLines();
+        if(inMenu == false)
+        {
+            DrawPortalLines();
+        }
     }
 
     private void DrawPortalLines()

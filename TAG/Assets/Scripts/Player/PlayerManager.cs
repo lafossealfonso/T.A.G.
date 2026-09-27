@@ -37,6 +37,11 @@ public class PlayerManager : MonoBehaviour
     [Header("Light Settins")]
     public bool levelUsingLights = false;
 
+    [Header("Player Labels")]
+    [SerializeField] private List<PlayerLabelUI> playerLabels;
+    [SerializeField] private Camera gameplayCamera;
+    [SerializeField] private Canvas labelCanvas;
+
     private void Awake()
     {
         if (Instance == null)
@@ -50,6 +55,11 @@ public class PlayerManager : MonoBehaviour
     private void Start()
     {
         startSlider.value = 0f;
+
+        foreach (PlayerLabelUI label in playerLabels)
+        {
+            label.Setup(gameplayCamera, labelCanvas);
+        }
     }
 
     private void OnEnable()
@@ -207,6 +217,10 @@ public class PlayerManager : MonoBehaviour
 
         card.menuText.text = profile.playerName;
         card.ReadyUp(profile.playerColor);
+
+        // Label follow
+        playerLabels[playerIndex].AssignPlayer(
+            player.transform, profile.playerColor, profile.playerName);
     }
 
     public void RegisterPlayer(GameObject player, PlayerProfile playerProfile)
