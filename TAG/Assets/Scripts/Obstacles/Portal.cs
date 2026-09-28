@@ -69,37 +69,51 @@ public class Portal : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D other)
     {
-        if (!other.gameObject.CompareTag("Player"))
-            return;
+        if (other.gameObject.CompareTag("Player"))
+        {
+            PlayerMovement playerMovement = other.GetComponent<PlayerMovement>();
+            if (playerMovement == null)
+                return;
 
-        PlayerMovement playerMovement = other.GetComponent<PlayerMovement>();
-        if (playerMovement == null)
-            return;
+            portalFeedback.PlayFeedbacks();
 
-        portalFeedback.PlayFeedbacks();
+            Transform targetTransform = GetRandomLinkedPortal();
+            Vector2 exitPosition = GetExitPosition(targetTransform, other.attachedRigidbody);
 
+            playerMovement.TeleportAlongLine(transform.position, targetTransform.position, exitPosition, teleportDuration, lineRendererColor);
+        }
+        else if (other.gameObject.CompareTag("Obstacle"))
+        {
+            portalFeedback.PlayFeedbacks();
+
+            Transform targetTransform = GetRandomLinkedPortal();
+            Vector2 exitPosition = GetExitPosition(targetTransform, other.attachedRigidbody);
+
+            other.transform.position = exitPosition;
+        }
+    }
+
+    private Transform GetRandomLinkedPortal()
+    {
         int randomIndex = Random.Range(0, linkedPortals.Count);
-        Transform targetTransform = linkedPortals[randomIndex];
+        return linkedPortals[randomIndex];
+    }
 
-        Vector2 lineStart = transform.position;
-        Vector2 lineEnd = targetTransform.position;
-
-        Vector2 exitPosition;
-
+    private Vector2 GetExitPosition(Transform targetTransform, Rigidbody2D otherRigidbody)
+    {
         Portal targetPortalScript = targetTransform.GetComponent<Portal>();
 
         if (targetPortalScript != null && targetPortalScript.overrideExitPoint != null)
         {
-            exitPosition = targetPortalScript.overrideExitPoint.position;
-        }
-        else
-        {
-            Rigidbody2D rb = other.GetComponent<Rigidbody2D>();
-            Vector2 direction = rb.linearVelocity.normalized;
-            Vector2 offset = direction * teleportOffset;
-            exitPosition = lineEnd + offset;
+            return targetPortalScript.overrideExitPoint.position;
         }
 
-        playerMovement.TeleportAlongLine(lineStart, lineEnd, exitPosition, teleportDuration, lineRendererColor);
+        Vector2 direction = otherRigidbody != null
+            ? otherRigidbody.linearVelocity.normalized
+            : Vector2.zero;
+
+        Vector2 offset = direction * teleportOffset;
+
+        return (Vector2)targetTransform.position + offset;
     }
 }

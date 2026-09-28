@@ -1683,6 +1683,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   startFadePlayer: {fileID: 5790866040191930265}
+  roundScoreFeedbackPlayer: {fileID: 0}
+  roundScorePlayerText: {fileID: 0}
   roundFadePlayer: {fileID: 0}
   roundReverseFadePlayer: {fileID: 0}
   roundFadePlayerLabel: {fileID: 0}

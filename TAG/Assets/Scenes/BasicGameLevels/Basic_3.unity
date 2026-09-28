@@ -2634,6 +2634,10 @@ PrefabInstance:
       propertyPath: m_Sprite
       value: 
       objectReference: {fileID: 21300000, guid: 15074f3cb9ecae447b803d57ccb5cd39, type: 3}
+    - target: {fileID: 2863021768295931635, guid: a019b00fa8dd3a047aa8b6e111474f15, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -2.57
+      objectReference: {fileID: 0}
     - target: {fileID: 3220425282580990307, guid: a019b00fa8dd3a047aa8b6e111474f15, type: 3}
       propertyPath: m_LocalScale.x
       value: 0.5557255
@@ -2650,6 +2654,18 @@ PrefabInstance:
       propertyPath: m_LocalPosition.x
       value: 14.440001
       objectReference: {fileID: 0}
+    - target: {fileID: 3535108938856617886, guid: a019b00fa8dd3a047aa8b6e111474f15, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 2.62
+      objectReference: {fileID: 0}
+    - target: {fileID: 3651625259284749265, guid: a019b00fa8dd3a047aa8b6e111474f15, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 1.94
+      objectReference: {fileID: 0}
+    - target: {fileID: 3804394388481150477, guid: a019b00fa8dd3a047aa8b6e111474f15, type: 3}
+      propertyPath: overrideExitPoint
+      value: 
+      objectReference: {fileID: 8957192760268057212}
     - target: {fileID: 3804394388481150477, guid: a019b00fa8dd3a047aa8b6e111474f15, type: 3}
       propertyPath: 'linkedPortals.Array.data[0]'
       value: 
@@ -2694,10 +2710,26 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 7354140733154964531, guid: a019b00fa8dd3a047aa8b6e111474f15, type: 3}
+      propertyPath: overrideExitPoint
+      value: 
+      objectReference: {fileID: 8957192760268057211}
+    - target: {fileID: 8123207234450144606, guid: a019b00fa8dd3a047aa8b6e111474f15, type: 3}
+      propertyPath: overrideExitPoint
+      value: 
+      objectReference: {fileID: 8957192760268057210}
     - target: {fileID: 8123207234450144606, guid: a019b00fa8dd3a047aa8b6e111474f15, type: 3}
       propertyPath: 'linkedPortals.Array.data[0]'
       value: 
       objectReference: {fileID: 1247342947}
+    - target: {fileID: 8293795406967550225, guid: a019b00fa8dd3a047aa8b6e111474f15, type: 3}
+      propertyPath: overrideExitPoint
+      value: 
+      objectReference: {fileID: 8957192760268057213}
+    - target: {fileID: 8466692134819030221, guid: a019b00fa8dd3a047aa8b6e111474f15, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -2.24
+      objectReference: {fileID: 0}
     - target: {fileID: 8714104381236273132, guid: a019b00fa8dd3a047aa8b6e111474f15, type: 3}
       propertyPath: m_Radius
       value: 8.98
@@ -2715,6 +2747,26 @@ PrefabInstance:
       addedObject: {fileID: 2112953729}
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: a019b00fa8dd3a047aa8b6e111474f15, type: 3}
+--- !u!4 &8957192760268057210 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 3535108938856617886, guid: a019b00fa8dd3a047aa8b6e111474f15, type: 3}
+  m_PrefabInstance: {fileID: 8957192760268057209}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &8957192760268057211 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 2863021768295931635, guid: a019b00fa8dd3a047aa8b6e111474f15, type: 3}
+  m_PrefabInstance: {fileID: 8957192760268057209}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &8957192760268057212 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 8466692134819030221, guid: a019b00fa8dd3a047aa8b6e111474f15, type: 3}
+  m_PrefabInstance: {fileID: 8957192760268057209}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &8957192760268057213 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 3651625259284749265, guid: a019b00fa8dd3a047aa8b6e111474f15, type: 3}
+  m_PrefabInstance: {fileID: 8957192760268057209}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

@@ -13,7 +13,11 @@ using UnityEngine.UI;
 public class BasicGameMode : MonoBehaviour
 {
     [SerializeField] MMF_Player startFadePlayer;
-    [Header("Round Transition Fade Settings")]
+    [Header("Round Feedback Settings")]
+    [SerializeField] MMF_Player roundScoreFeedbackPlayer;
+    [SerializeField] TextMeshProUGUI roundScorePlayerText;
+    [SerializeField] TextMeshProUGUI roundScoreNumberText;
+    [Header("Winning Transition Fade Settings")]
     [SerializeField] MMF_Player roundFadePlayer;
     [SerializeField] MMF_Player roundReverseFadePlayer;
     [SerializeField] TextMeshProUGUI roundFadePlayerLabel;
@@ -54,6 +58,11 @@ public class BasicGameMode : MonoBehaviour
         SceneManager.sceneLoaded -= OnSceneLoaded;
     }
 
+    private void Awake()
+    {
+        roundScoreFeedbackPlayer.Events.OnComplete.AddListener(RoundSplashEnded);
+    }
+
 
 
     private void Start()
@@ -82,6 +91,7 @@ public class BasicGameMode : MonoBehaviour
         Basic_PlayerScoreCard playerCard = playerMovement.thisPlayerScoreCard;
 
         playerCard.playerScore += 1;
+        playerMovement.setIsIt(false);
         numberOfRoundsPlayed += 1;
         MMF_Player scorePlayer = scoreKeepers[numberOfRoundsPlayed - 1].gameObject.GetComponent<MMF_Player>();
         if (scorePlayer != null) scorePlayer.PlayFeedbacks();
@@ -90,12 +100,9 @@ public class BasicGameMode : MonoBehaviour
         roundFadePlayerLabel.text = playerCard.playerName;
         
 
-
-
-        ResetLevelForNextRound();
-
         if (playerCard.playerScore >= roundNumberLimit / 2)
         {
+            playerManager.TurnOffPlayerLabels(false);
             roundFadePlayerLabel.color = playerCard.playerColor;
             roundFadeIconSML.color = playerCard.playerColor * 0.55f;
             roundFadeIconMED.color = playerCard.playerColor * 0.9f;
@@ -111,19 +118,51 @@ public class BasicGameMode : MonoBehaviour
             //winnerDisplayName.gameObject.transform.parent.gameObject.SetActive(true);
             gameEnded = true;                    
         }
+
+        else
+        {
+            ResetLevelForNextRound(playerCard.playerName, playerCard.playerColor);
+        }
     }
 
+    //RESETING ROUND AND FEEDBACK LOGIC
 
-
-    void ResetLevelForNextRound()
+    void ResetLevelForNextRound(string playerName, Color playerColor)
     {
-        
-        
+        Debug.Log("Resetting Level");
+        roundScorePlayerText.color = playerColor;
+        roundScorePlayerText.text = playerName;
+        string roundNumber;
+
+        if (numberOfRoundsPlayed == 1) {roundNumber = "ONE";}
+        else if (numberOfRoundsPlayed == 2) { roundNumber = "TWO"; }
+        else if (numberOfRoundsPlayed == 3) { roundNumber = "THREE"; }
+        else if (numberOfRoundsPlayed == 4) { roundNumber = "FOUR"; }
+        else if (numberOfRoundsPlayed == 5) { roundNumber = "FIVE"; }
+        else { roundNumber = "NULL"; }
+
+        roundScoreNumberText.text = roundNumber;
+
+        roundScoreFeedbackPlayer.PlayFeedbacks();
+        StartCoroutine(MidCallbackRoutine());  
+
+    }
+
+    private IEnumerator MidCallbackRoutine()
+    {
+        float midPoint = roundScoreFeedbackPlayer.TotalDuration * 0.5f;
+        yield return new WaitForSeconds(midPoint);
+
         playerManager.ResetPlayerPositions();
         starTransform.gameObject.SetActive(true);
-        playerManager.SetPlayerCanMove(true);
-
     }
+
+    void RoundSplashEnded()
+    {
+        playerManager.SetPlayerCanMove(true);
+    }
+
+    //END RESET ROUND LOGIC
 
     void Update()
     {

@@ -11,6 +11,8 @@ public class GameManager : MonoBehaviour
     public static GameManager Instance;
     public static event Action<GameObject, GameObject> OnPlayerTagged;
     public static event Action<GameObject> OnWinnerChosen;
+    public static event Action<bool> GameStarted;
+
 
     [Header("Feedback Setups")]
     public MMF_Player playerTaggedEffectPlayer;
@@ -27,7 +29,10 @@ public class GameManager : MonoBehaviour
         Instance = this;
         DontDestroyOnLoad(gameObject);
     }
-
+    public void gameManagerStartGame(bool gameState)
+    {
+        GameStarted?.Invoke(gameState);
+    }
     public void PlayerTagged(GameObject taggingPlayer, GameObject taggedPlayer)
     {
         Debug.Log(taggedPlayer.name + "was Tagged");

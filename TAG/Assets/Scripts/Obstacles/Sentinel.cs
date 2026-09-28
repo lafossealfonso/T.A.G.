@@ -28,10 +28,26 @@ public class Sentinel : MonoBehaviour
     [SerializeField] private float idleFeedbackMinDelay = 0.5f;
     [SerializeField] private float idleFeedbackMaxDelay = 2f;
 
+    public bool isActive;
+
 
     private readonly HashSet<Transform> playersInRange = new HashSet<Transform>();
     private Transform currentTarget;
 
+    private void OnEnable()
+    {
+        GameManager.GameStarted += SetActive;
+    }
+
+    private void OnDisable()
+    {
+        GameManager.GameStarted -= SetActive;
+    }
+
+    private void SetActive(bool active)
+    {
+        isActive = active;
+    }
     private void Start()
     {
         targetLine.positionCount = 2;
@@ -43,6 +59,7 @@ public class Sentinel : MonoBehaviour
 
     private void Update()
     {
+        if (isActive == false) return;
         UpdateTargeting();
         RotateTowardsTarget();
     }

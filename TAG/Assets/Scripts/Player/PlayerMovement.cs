@@ -204,6 +204,7 @@ public class PlayerMovement : MonoBehaviour
         lightObject.gameObject.SetActive(isTeleporting);
         teleportingVisual.color = color;
         teleportingVisual.enabled = isTeleporting;
+        itIndicator.SetActive(!isTeleporting);
     }
     //-----------------------------------------------
     public void BoostPad()

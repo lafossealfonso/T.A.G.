@@ -166,7 +166,7 @@ public class PlayerManager : MonoBehaviour
         MMF_Player menuParentFeedbackPLayer = menuParent.GetComponent<MMF_Player>();
         if(menuParentFeedbackPLayer != null) menuParentFeedbackPLayer.PlayFeedbacks();
         SetPlayerCanMove(true);
-        
+        GameManager.Instance.gameManagerStartGame(true);
         playerInputManager.DisableJoining();
     }
 
@@ -376,6 +376,14 @@ public class PlayerManager : MonoBehaviour
             }
 
             playerTestMode = false;
+        }
+    }
+
+    public void TurnOffPlayerLabels(bool toState)
+    {
+        foreach(PlayerLabelUI label in playerLabels)
+        {
+            label.gameObject.SetActive(toState);
         }
     }
 }

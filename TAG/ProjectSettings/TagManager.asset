@@ -6,6 +6,7 @@ TagManager:
   tags:
   - WeakSpot
   - Star
+  - Obstacle
   layers:
   - Default
   - TransparentFX

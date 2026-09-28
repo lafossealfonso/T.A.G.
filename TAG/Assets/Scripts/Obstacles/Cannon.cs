@@ -7,6 +7,7 @@ public class Cannon : MonoBehaviour
     [Header("Cannonball")]
     [SerializeField] private GameObject cannonballPrefab;
     [SerializeField] private Transform firePoint;
+    [SerializeField] private bool isActive;
 
     [Header("Firing")]
     [SerializeField] private float shootForce;
@@ -26,6 +27,21 @@ public class Cannon : MonoBehaviour
     // Everyone currently standing inside this Cannon's trigger area.
     private readonly HashSet<Transform> playersInRange = new HashSet<Transform>();
 
+    private void OnEnable()
+    {
+        GameManager.GameStarted += SetActive;
+    }
+
+    private void OnDisable()
+    {
+        GameManager.GameStarted -= SetActive;
+    }
+
+    private void SetActive(bool active)
+    {
+        isActive = active;
+        StartCoroutine(CannonLoop());
+    }
     private void Start()
     {
         targetLine.positionCount = 2;
@@ -36,7 +52,7 @@ public class Cannon : MonoBehaviour
 
     private void Update()
     {
-        UpdateTargetLine();
+        if(isActive) UpdateTargetLine();
     }
 
     private void UpdateTargetLine()
