@@ -34,6 +34,9 @@ public class PlayerMovement : MonoBehaviour
     public PlayerMenuCard thisPlayerMenuCard;
     public int playerIndex;
 
+    private bool isKnockedBack = false;
+    private Coroutine knockbackCoroutine;
+
     //me when I begin the day
     private void Awake()
     {
@@ -97,6 +100,14 @@ public class PlayerMovement : MonoBehaviour
 
     private void Move()
     {
+        if (isKnockedBack)
+        {
+            // Don't inject player input — let the knockback velocity
+            // play out and decay on its own via linear drag.
+            rb.linearVelocity *= isIt ? 0.88f : 0.9f;
+            return;
+        }
+
         if (isIt)
         {
             rb.linearVelocity = new Vector2(
@@ -113,9 +124,9 @@ public class PlayerMovement : MonoBehaviour
         ) + rb.linearVelocity * 0.9f;
         }
 
-        if(canMove == false)
+        if (canMove == false)
         {
-            rb.linearVelocity = new Vector2(0f,0f);
+            rb.linearVelocity = new Vector2(0f, 0f);
         }
     }
 
@@ -229,6 +240,32 @@ public class PlayerMovement : MonoBehaviour
     }
     //-----------------------------------------------
 
+    //-----------------------------------------------
+    public void Bumped(Vector2 impulseForce, float duration)
+    {
+        if (knockbackCoroutine != null)
+            StopCoroutine(knockbackCoroutine);
+
+        knockbackCoroutine = StartCoroutine(KnockbackRoutine(impulseForce, duration));
+    }
+
+    private IEnumerator KnockbackRoutine(Vector2 impulseForce, float duration)
+    {
+        isKnockedBack = true;
+
+        // Zero existing velocity first so the impulse alone determines the
+        // outcome, instead of blending with whatever momentum the player
+        // already had (which is what was making it feel mushy/slippery).
+        rb.linearVelocity = Vector2.zero;
+        rb.AddForce(impulseForce, ForceMode2D.Impulse);
+
+        yield return new WaitForSeconds(duration);
+
+        isKnockedBack = false;
+        knockbackCoroutine = null;
+    }
+    //-----------------------------------------------
+
     private bool canTag = true;
 
     private void OnCollisionEnter2D(Collision2D collision)
@@ -287,7 +324,11 @@ public class PlayerMovement : MonoBehaviour
     {
         this.isIt = isIt;
         itIndicator.SetActive(isIt);
-        thisPlayerScoreCard.PlayIsItFeedback();
+        if (isIt)
+        {
+            thisPlayerScoreCard.PlayIsItFeedback();
+        }
+        
     }
 
     public bool returnIsIt()

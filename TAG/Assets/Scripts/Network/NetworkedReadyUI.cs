@@ -1,7 +1,6 @@
 using UnityEngine;
 using TMPro;
 using UnityEngine.UI;
-using UnityEditor.Build.Player;
 
 public class NetworkedReadyUI : MonoBehaviour
 {

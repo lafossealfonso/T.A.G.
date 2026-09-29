@@ -37,6 +37,11 @@ public class Basic_PlayerScoreCard : MonoBehaviour
     [SerializeField] MMF_Player feedbackPlayer;
     //[SerializeField] private AnimationCurve intensityCurve;
 
+    [Header("Scale Growth")]
+    [SerializeField] private Vector3 baseScale = Vector3.one;
+    [SerializeField] private Vector3 maxScale = Vector3.one * 1.3f;
+    [SerializeField] private float scaleLerpSpeed = 6f;
+
 
     public void AssignPlayer(GameObject player, Color color, string name)
     {
@@ -92,8 +97,15 @@ public class Basic_PlayerScoreCard : MonoBehaviour
 
     }
 
+    private void UpdateFillScale(float normalizedFill)
+    {
+        Vector3 targetScale = Vector3.Lerp(baseScale, maxScale, normalizedFill);
+        transform.localScale = Vector3.Lerp(transform.localScale, targetScale, scaleLerpSpeed * Time.deltaTime);
+    }
     private void Start()
     {
+        baseScale = transform.localScale;
+
         foreach (GameObject item in turnOffObjectList)
         {
             item.SetActive(false);
@@ -130,6 +142,7 @@ public class Basic_PlayerScoreCard : MonoBehaviour
         percentageText.text = Mathf.RoundToInt(scoreSlider.value).ToString() + "%";
 
         float normalizedTime = scoreSlider.value / scoreSlider.maxValue;
+        UpdateFillScale(normalizedTime);
         //float curveValue = intensityCurve.Evaluate(normalizedTime);
 
 

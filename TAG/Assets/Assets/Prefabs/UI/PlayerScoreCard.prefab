@@ -737,6 +737,9 @@ MonoBehaviour:
   playerName: 
   playerColor: {r: 0, g: 0, b: 0, a: 0}
   feedbackPlayer: {fileID: 4288763380770016171}
+  baseScale: {x: 1, y: 1, z: 1}
+  maxScale: {x: 1.5, y: 1.5, z: 1.5}
+  scaleLerpSpeed: 6
 --- !u!114 &4288763380770016171
 MonoBehaviour:
   m_ObjectHideFlags: 0

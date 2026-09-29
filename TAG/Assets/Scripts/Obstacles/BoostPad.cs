@@ -7,10 +7,14 @@ public class BoostPad : MonoBehaviour
     [SerializeField] MMF_Player boostFeedback;
     private void OnTriggerEnter2D(Collider2D other)
     {
-        boostFeedback.PlayFeedbacks();
+        
         if (other.gameObject.CompareTag("Player"))
         {
-            PlayerMovement playerMovement = other.GetComponent<PlayerMovement>();
+            if (boostFeedback != null)
+            {
+                boostFeedback.PlayFeedbacks();
+            }
+                PlayerMovement playerMovement = other.GetComponent<PlayerMovement>();
             playerMovement.BoostPad();
             return;
         }

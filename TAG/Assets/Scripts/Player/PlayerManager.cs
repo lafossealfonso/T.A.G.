@@ -122,6 +122,8 @@ public class PlayerManager : MonoBehaviour
         for (int i = 0; i < players.Count; i++)
         {
             players[i].transform.position = spawnPoints[i].position;
+            Rigidbody2D iRb = players[i].GetComponent<Rigidbody2D>();
+            iRb.linearVelocity = Vector3.zero;
             PlayerMovement playerMovement = players[i].GetComponent<PlayerMovement>();
             if (playerMovement != null) playerMovement.setIsIt(false);
             scoreCards[i].ResetSliders();
