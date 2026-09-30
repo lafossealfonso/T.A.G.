@@ -7,6 +7,7 @@ public class Portal : MonoBehaviour
     public List<Transform> linkedPortals;
     public float teleportOffset;
     public float teleportDuration = 0.5f;
+    public bool lineRenderersOn = false;
     [SerializeField] MMF_Player portalFeedback;
 
     [Header("Exit Override")]
@@ -24,7 +25,7 @@ public class Portal : MonoBehaviour
 
     private void Start()
     {
-        if(inMenu == false)
+        if(inMenu == false && lineRenderersOn == true)
         {
             DrawPortalLines();
         }

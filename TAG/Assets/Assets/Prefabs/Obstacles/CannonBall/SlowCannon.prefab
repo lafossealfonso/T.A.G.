@@ -137,7 +137,7 @@ LineRenderer:
     shadowBias: 0.5
     generateLightingData: 0
   m_MaskInteraction: 0
-  m_UseWorldSpace: 0
+  m_UseWorldSpace: 1
   m_Loop: 0
   m_ApplyActiveColorSpace: 1
 --- !u!1 &6258606125769887786
@@ -189,6 +189,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   cannonballPrefab: {fileID: 6069533188080673496, guid: bef4b0c31d27cf14d908848a6fc388b9, type: 3}
   firePoint: {fileID: 8444994136810300166}
+  isActive: 0
   shootForce: 1500
   reloadTime: 5
   growSpinSpeed: 360
@@ -229,7 +230,7 @@ CircleCollider2D:
   m_CompositeOperation: 0
   m_CompositeOrder: 0
   m_Offset: {x: 0, y: 0}
-  m_Radius: 9
+  m_Radius: 10.26
 --- !u!1 &6892449209229685494
 GameObject:
   m_ObjectHideFlags: 0

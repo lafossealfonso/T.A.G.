@@ -22,10 +22,14 @@ public class BumperPad : MonoBehaviour
         Rigidbody2D rb = collision.rigidbody;
         if (rb == null) return;
 
-        // Fixed, not read from the collision -- this bumper always faces
-        // one direction since it's mounted flat against a wall. This avoids
-        // the inconsistent per-contact normals you get from box colliders
-        // (corners especially can report a different contact than the flat face).
+        bool isPlayer = collision.gameObject.CompareTag("Player");
+        bool isObstacle = collision.gameObject.CompareTag("Obstacle");
+
+        // Only react to things we explicitly want the bumper to affect --
+        // anything else (world geometry, decorations with a stray Rigidbody2D)
+        // gets ignored entirely.
+        if (!isPlayer && !isObstacle) return;
+
         Vector2 normal = transform.up;
 
         Vector2 incomingVelocity = collision.relativeVelocity;
@@ -36,33 +40,28 @@ public class BumperPad : MonoBehaviour
 
         Vector2 reflectedDirection = Vector2.Reflect(incomingVelocity.normalized, normal);
 
-        // Additive rather than multiplicative -- each bumper adds a fixed kick
-        // instead of scaling up whatever speed the player already had, so
-        // chaining through multiple bumpers grows linearly instead of exponentially.
         float rawExitSpeed = incomingVelocity.magnitude + bumpKickAmount;
-
-        // Clamp handles both ends: never weaker than minimumExitSpeed,
-        // never stronger than maximumExitSpeed.
         float exitSpeed = Mathf.Clamp(rawExitSpeed, minimumExitSpeed, maximumExitSpeed);
 
         Vector2 impulseForce = reflectedDirection * exitSpeed * rb.mass;
-        PlayerMovement playerMovement = collision.gameObject.GetComponentInParent<PlayerMovement>();
 
-        if (playerMovement != null)
+        if (isPlayer)
         {
-            playerMovement.Bumped(impulseForce, knockbackDuration);
-        }
-        else
-        {
-            rb.linearVelocity = Vector2.zero;
-            rb.AddForce(impulseForce, ForceMode2D.Impulse);
+            PlayerMovement playerMovement = collision.gameObject.GetComponentInParent<PlayerMovement>();
+
+            if (playerMovement != null)
+            {
+                playerMovement.Bumped(impulseForce, knockbackDuration);
+                return;
+            }
         }
 
-        bumperPadFeedback.PlayFeedbacks();
+        // Obstacle-tagged objects (or a Player without a PlayerMovement
+        // component for some reason) just get a plain physics impulse --
+        // no input-lockout coroutine needed since they don't read input anyway.
+        rb.linearVelocity = Vector2.zero;
+        rb.AddForce(impulseForce, ForceMode2D.Impulse);
     }
-
-    // Draws an arrow in the Scene view so you can see exactly which way
-    // the bumper thinks it's facing while you're placing/rotating it.
     private void OnDrawGizmos()
     {
         Gizmos.color = Color.cyan;
