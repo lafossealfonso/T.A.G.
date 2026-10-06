@@ -1,12 +1,15 @@
-using Unity.Cinemachine;
-using UnityEngine.InputSystem;
-using UnityEngine;
+using DG.Tweening;
+using HardLight2DUtil;
+using MoreMountains.Feedbacks;
 using System.Collections.Generic;
 using TMPro;
-using UnityEngine.UI;
-using MoreMountains.Feedbacks;
-using HardLight2DUtil;
+using Unity.Cinemachine;
 using Unity.VisualScripting;
+using UnityEngine;
+using UnityEngine.InputSystem;
+using UnityEngine.InputSystem;
+using UnityEngine.InputSystem.DualShock;
+using UnityEngine.UI;
 
 
 public class PlayerManager : MonoBehaviour
@@ -223,6 +226,22 @@ public class PlayerManager : MonoBehaviour
         // Label follow
         playerLabels[playerIndex].AssignPlayer(
             player.transform, profile.playerColor, profile.playerName);
+
+        PlayerInput input = player.GetComponentInParent<PlayerInput>();
+        if (input == null) return;
+
+        // Each PlayerInput knows which device(s) it's paired with.
+        foreach (UnityEngine.InputSystem.InputDevice device in player.devices)
+        {
+            if (device is UnityEngine.InputSystem.Gamepad pad)
+            {
+                if (pad is UnityEngine.InputSystem.DualShock.DualShockGamepad dualShock)
+                {
+                    dualShock.SetLightBarColor(profile.playerColor);
+                }
+                break;
+            }
+        }
     }
 
     public void RegisterPlayer(GameObject player, PlayerProfile playerProfile)

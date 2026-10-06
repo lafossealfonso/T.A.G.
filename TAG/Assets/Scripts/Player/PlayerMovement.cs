@@ -313,7 +313,11 @@ public class PlayerMovement : MonoBehaviour
             collision.gameObject.SetActive(false);
             //GameManager.Instance.RemoveFromCinemachineTargetGroup(collision.gameObject.transform);
             setIsIt(true);
-            
+            GameManager.Instance.PlayerTagged(
+                    this.gameObject,
+                    collision.gameObject
+                );
+
             Debug.Log("isit");
         }
     }

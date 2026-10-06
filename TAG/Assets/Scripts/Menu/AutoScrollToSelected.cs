@@ -2,86 +2,76 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
+[RequireComponent(typeof(ScrollRect))]
 public class AutoScrollToSelected : MonoBehaviour
 {
-    [SerializeField] private ScrollRect scrollRect;
-    [SerializeField] private RectTransform viewport;
-    [SerializeField] private RectTransform content;
-    [SerializeField] private float scrollMultiplier = 0.3f;
+    [Tooltip("Pixels to move per press. Use item height + Vertical Layout Group spacing.")]
+    [SerializeField] private float scrollStep = 100f;
     [SerializeField] private float scrollLerpSpeed = 12f;
 
-    private Vector2 targetPosition;
-    private GameObject lastSelected;
+    private ScrollRect scrollRect;
+    private RectTransform content;
+    private int lastIndex = -1;
+    private float targetNormalized;
+    private bool isScrolling;
 
     private void Awake()
-{
-    scrollRect = GetComponent<ScrollRect>();
-    viewport = scrollRect.viewport;
-    content = scrollRect.content;
-
-    targetPosition = content.anchoredPosition;
-}
-    private void Reset()
     {
         scrollRect = GetComponent<ScrollRect>();
-
-        if (scrollRect != null)
-        {
-            viewport = scrollRect.viewport;
-            content = scrollRect.content;
-        }
+        content = scrollRect.content;
     }
 
     private void Update()
     {
-        GameObject selected = EventSystem.current.currentSelectedGameObject;
+        CheckSelection();
 
-        if (selected == null || selected == lastSelected)
-            return;
+        if (!isScrolling) return;
 
-        RectTransform selectedRect = selected.GetComponent<RectTransform>();
+        float t = 1f - Mathf.Exp(-scrollLerpSpeed * Time.unscaledDeltaTime);
+        scrollRect.verticalNormalizedPosition =
+            Mathf.Lerp(scrollRect.verticalNormalizedPosition, targetNormalized, t);
 
-        if (selectedRect == null || !selectedRect.IsChildOf(content))
-            return;
-
-        lastSelected = selected;
-
-        ScrollToSelected(selectedRect);
-        content.anchoredPosition = Vector2.Lerp(
-    content.anchoredPosition,
-    targetPosition,
-    Time.deltaTime * scrollLerpSpeed
-);
+        if (Mathf.Abs(scrollRect.verticalNormalizedPosition - targetNormalized) < 0.001f)
+        {
+            scrollRect.verticalNormalizedPosition = targetNormalized;
+            isScrolling = false;
+        }
     }
 
-    private void ScrollToSelected(RectTransform selectedRect)
+    private void CheckSelection()
     {
-        Canvas.ForceUpdateCanvases();
+        GameObject selected = EventSystem.current.currentSelectedGameObject;
 
-        Bounds selectedBounds =
-            RectTransformUtility.CalculateRelativeRectTransformBounds(
-                viewport,
-                selectedRect
-            );
-
-        Rect viewportRect = viewport.rect;
-
-        float moveAmount = 0f;
-
-        // Selected item is above the visible viewport.
-        if (selectedBounds.max.y > viewportRect.yMax)
-        {
-            moveAmount = selectedBounds.max.y - viewportRect.yMax;
-        }
-        // Selected item is below the visible viewport.
-        else if (selectedBounds.min.y < viewportRect.yMin)
-        {
-            moveAmount = selectedBounds.min.y - viewportRect.yMin;
-        }
-
-        if (Mathf.Approximately(moveAmount, 0f))
+        if (selected == null || !selected.transform.IsChildOf(content))
             return;
 
-        targetPosition.y -= moveAmount * scrollMultiplier;
+        // Find which direct child of the content is selected (its position in the list).
+        Transform item = selected.transform;
+        while (item.parent != content) item = item.parent;
+        int index = item.GetSiblingIndex();
+
+        if (index == lastIndex) return;
+
+        int previous = lastIndex;
+        lastIndex = index;
+
+        if (previous == -1) return; // first selection, nothing to scroll yet
+
+        Scroll(index > previous ? -1 : 1); // moved down -> scroll down, moved up -> scroll up
+    }
+
+    private void Scroll(int direction)
+    {
+        float scrollableHeight = content.rect.height - scrollRect.viewport.rect.height;
+        if (scrollableHeight <= 0f) return; // everything already fits on screen
+
+        // Normalized position: 1 = very top of the list, 0 = very bottom.
+        float stepNormalized = scrollStep / scrollableHeight;
+
+        if (!isScrolling)
+            targetNormalized = scrollRect.verticalNormalizedPosition;
+
+        targetNormalized = Mathf.Clamp01(targetNormalized + direction * stepNormalized);
+        isScrolling = true;
     }
 }

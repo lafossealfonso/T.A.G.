@@ -394,4 +394,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   nameText: {fileID: 7485940745010128291}
   iconText: {fileID: 7098913240372234575}
-  worldOffset: {x: 0, y: 1, z: 0}
+  worldOffset: {x: 0, y: 1.5, z: 0}
