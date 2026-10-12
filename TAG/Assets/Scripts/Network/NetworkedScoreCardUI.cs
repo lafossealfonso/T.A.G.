@@ -1,3 +1,4 @@
+using MoreMountains.Feedbacks;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -11,6 +12,14 @@ public class NetworkedScoreCardUI : MonoBehaviour
     [SerializeField] private Image fillImage;
 
     private OnlineBasic_PlayerScoreCard boundScoreCard;
+
+    [Header("Feedback")]
+    [SerializeField] private MMF_Player isItFeedbackPlayer; // same as Basic_PlayerScoreCard.feedbackPlayer
+
+    public void PlayIsItFeedback()
+    {
+        if (isItFeedbackPlayer != null) isItFeedbackPlayer.PlayFeedbacks();
+    }
 
     public void BindToPlayer(OnlineBasic_PlayerScoreCard scoreCard, PlayerProfile profile)
     {

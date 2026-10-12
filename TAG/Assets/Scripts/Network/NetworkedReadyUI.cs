@@ -1,14 +1,25 @@
-using UnityEngine;
+using MoreMountains.Feedbacks;
 using TMPro;
+using UnityEngine;
 using UnityEngine.UI;
 
 public class NetworkedReadyUI : MonoBehaviour
 {
-    [SerializeField] private TextMeshProUGUI playerNameText;
-    [SerializeField] private Image colorIcon;
+    //[SerializeField] private TextMeshProUGUI playerNameText;
+    [SerializeField] private Image tickFrame;
     [SerializeField] private GameObject readyTick;
 
     private NetworkedPlayerData boundPlayerData;
+
+    [Header("Feedback")]
+    [SerializeField] private MMF_Player nudgeFeedbackPlayer; // same as PlayerMenuCard.thisFeedbackPlayer
+
+    public void PlayNudgeFeedback(int channel)
+    {
+        if (nudgeFeedbackPlayer == null) return;
+        nudgeFeedbackPlayer.MMF_Channel = channel;
+        nudgeFeedbackPlayer.PlayFeedbacks();
+    }
 
     public void BindToPlayer(NetworkedPlayerData playerData, PlayerProfile profile)
     {
@@ -19,13 +30,8 @@ public class NetworkedReadyUI : MonoBehaviour
 
         if (profile != null)
         {
-            if (playerNameText != null)
-            {
-                playerNameText.text = profile.playerName;
-                playerNameText.color = profile.playerColor;
-            }
 
-            if (colorIcon != null) colorIcon.color = profile.playerColor;
+            if (tickFrame != null) tickFrame.gameObject.SetActive(true); tickFrame.color = profile.playerColor;
         }
 
         HandleReadyChanged(false, boundPlayerData.isReady.Value);
@@ -34,6 +40,7 @@ public class NetworkedReadyUI : MonoBehaviour
     private void HandleReadyChanged(bool previousValue, bool newValue)
     {
         if (readyTick != null) readyTick.SetActive(newValue);
+        Debug.Log(newValue);
     }
 
     private void Unbind()

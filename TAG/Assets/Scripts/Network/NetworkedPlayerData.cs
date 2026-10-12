@@ -1,5 +1,8 @@
-using UnityEngine;
+using MoreMountains.Feedbacks;
 using Unity.Netcode;
+using UnityEngine;
+using UnityEngine.InputSystem;
+using UnityEngine.InputSystem.DualShock;
 
 public class NetworkedPlayerData : NetworkBehaviour
 {
@@ -34,14 +37,29 @@ public class NetworkedPlayerData : NetworkBehaviour
         NetworkVariableReadPermission.Everyone,
         NetworkVariableWritePermission.Server);
 
-    [Header("Visual References (mirrors old PlayerMovement fields)")]
+    [Header("Visual References")]
     [SerializeField] private GameObject itIndicator;
+
+    [SerializeField] private SpriteRenderer playerVisual;
+    [SerializeField] private SpriteRenderer directionIndicator;
+    [SerializeField] private TrailRenderer trail;
+    [SerializeField] private HardLight2D lightObject;
+
+    
+    private Sprite defaultSprite;
+
+    private void Awake()
+    {
+        if (playerVisual != null) defaultSprite = playerVisual.sprite;
+    }
+
 
     public override void OnNetworkSpawn()
     {
         isIt.OnValueChanged += HandleIsItChanged;
         profileIndex.OnValueChanged += HandleProfileChanged;
         slotIndex.OnValueChanged += HandleSlotIndexChanged;
+        isReady.OnValueChanged += HandleReadyChanged;
 
         HandleIsItChanged(false, isIt.Value);
         HandleProfileChanged(-1, profileIndex.Value);
@@ -52,6 +70,13 @@ public class NetworkedPlayerData : NetworkBehaviour
     {
         isIt.OnValueChanged -= HandleIsItChanged;
         profileIndex.OnValueChanged -= HandleProfileChanged;
+        slotIndex.OnValueChanged -= HandleSlotIndexChanged;
+        isReady.OnValueChanged -= HandleReadyChanged;
+        if (NetworkedPlayerManager.Instance != null && slotIndex.Value >= 0)
+        {
+            PlayerLabelUI label = NetworkedPlayerManager.Instance.GetLabel(slotIndex.Value);
+            if (label != null) label.ClearPlayer();
+        }
     }
 
     private void HandleIsItChanged(bool previousValue, bool newValue)
@@ -61,17 +86,85 @@ public class NetworkedPlayerData : NetworkBehaviour
         {
             itIndicator.SetActive(newValue);
         }
+
+        if (newValue && slotIndex.Value >= 0 && NetworkedPlayerManager.Instance != null)
+        {
+            NetworkedScoreCardUI slot = NetworkedPlayerManager.Instance.GetScoreCardSlot(slotIndex.Value);
+            if (slot != null) slot.PlayIsItFeedback();
+        }
     }
+
+
 
     private void HandleProfileChanged(int previousValue, int newValue)
     {
-        // TODO: once PlayerProfile assignment is ported over, apply
-        // color/sprite here -- same job old PlayerManager.ApplyProfile() did.
+        ApplyProfileVisuals(newValue);
+        TryBindScoreCardSlot();
+    }
+
+    private void ApplyProfileVisuals(int index)
+    {
+        if (NetworkedPlayerManager.Instance == null) return;
+
+        PlayerProfile profile = NetworkedPlayerManager.Instance.GetProfile(index);
+        if (profile == null) return; // -1 = not assigned yet
+
+        Color color = profile.playerColor;
+
+        if (lightObject != null) lightObject.Color = color;
+
+        if (playerVisual != null)
+        {
+            if (profile.isSprite)
+            {
+                playerVisual.sprite = profile.playerSprite;
+                playerVisual.color = Color.white;
+            }
+            else
+            {
+                playerVisual.sprite = defaultSprite;
+                playerVisual.color = color;
+            }
+        }
+
+        if (directionIndicator != null)
+            directionIndicator.color = Color.Lerp(color, Color.white, 0.6f);
+
+        if (trail != null)
+        {
+            Gradient gradient = new Gradient();
+            gradient.SetKeys(
+                new GradientColorKey[]
+                {
+                new GradientColorKey(color, 0f),
+                new GradientColorKey(Color.white, 1f)
+                },
+                new GradientAlphaKey[]
+                {
+                new GradientAlphaKey(1f, 0f),
+                new GradientAlphaKey(1f, 1f)
+                });
+            trail.colorGradient = gradient;
+        }
+
+        // Controller light bar: only the player who owns this object has this
+        // machine's controller, so only they should set it.
+        if (IsOwner && Gamepad.current is DualShockGamepad dualShock)
+            dualShock.SetLightBarColor(color);
+    }
+
+    private void HandleReadyChanged(bool previousValue, bool newValue)
+    {
+        if (newValue && NetworkedPlayerManager.Instance != null)
+            NetworkedPlayerManager.Instance.ShakeUI();
     }
 
     private void HandleSlotIndexChanged(int previousValue, int newValue)
     {
         TryBindScoreCardSlot();
+
+        if (previousValue < 0 && newValue >= 0 && NetworkedPlayerManager.Instance != null)
+            NetworkedPlayerManager.Instance.ShakeUI();
     }
 
     private void TryBindScoreCardSlot()
@@ -88,11 +181,17 @@ public class NetworkedPlayerData : NetworkBehaviour
             if (scoreCard != null) scoreSlot.BindToPlayer(scoreCard, profile);
         }
 
-        //NetworkedReadyUI readySlot = NetworkedPlayerManager.Instance.GetReadyUISlot(slotIndex.Value);
-        //if (readySlot != null)
-        //{
-        //    readySlot.BindToPlayer(this, profile);
-        //}
+        NetworkedReadyUI readySlot = NetworkedPlayerManager.Instance.GetReadyUISlot(slotIndex.Value);
+        if (readySlot != null)
+        {
+            readySlot.BindToPlayer(this, profile);
+        }
+
+        PlayerLabelUI label = NetworkedPlayerManager.Instance.GetLabel(slotIndex.Value);
+        if (label != null && profile != null)
+        {
+            label.AssignPlayer(transform, profile.playerColor, profile.playerName);
+        }
     }
     // --- Server-only setters -------------------------------------------
 
@@ -201,10 +300,18 @@ public class NetworkedPlayerData : NetworkBehaviour
     [ServerRpc]
     public void RequestReadyServerRpc()
     {
-        // Ignore repeat presses -- once ready, stays ready (one-directional for now)
         if (isReady.Value) return;
 
         ServerSetReady(true);
-        //NetworkedPlayerManager.Instance?.ServerNotifyPlayerReady(OwnerClientId);
+
+        if (NetworkedPlayerManager.Instance != null)
+            NetworkedPlayerManager.Instance.ServerNotifyPlayerReady(OwnerClientId);
+    }
+
+    [ServerRpc]
+    public void RequestCycleProfileServerRpc(int direction)
+    {
+        if (NetworkedPlayerManager.Instance != null)
+            NetworkedPlayerManager.Instance.ServerCycleProfile(OwnerClientId, direction);
     }
 }

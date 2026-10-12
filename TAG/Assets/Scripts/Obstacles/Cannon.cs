@@ -44,10 +44,7 @@ public class Cannon : MonoBehaviour
     }
     private void Start()
     {
-        targetLine.positionCount = 2;
-        targetLine.enabled = false;
-
-        StartCoroutine(CannonLoop());
+        
     }
 
     private void Update()

@@ -38,6 +38,7 @@ public class NetworkedPlayerMovement : NetworkBehaviour
             moveAction.action.Enable();
             readyAction.action.Enable();
             readyAction.action.performed += OnReadyPerformed;
+            moveAction.action.performed += OnMovePerformed;
         }
     }
 
@@ -48,6 +49,7 @@ public class NetworkedPlayerMovement : NetworkBehaviour
             moveAction.action.Disable();
             readyAction.action.Disable();
             readyAction.action.performed -= OnReadyPerformed;
+            moveAction.action.performed -= OnMovePerformed;
         }
     }
 
@@ -56,6 +58,7 @@ public class NetworkedPlayerMovement : NetworkBehaviour
         if (!IsOwner) return;
 
         moveInput = moveAction.action.ReadValue<Vector2>();
+        HandleProfileCycleInput();
     }
 
     private void FixedUpdate()
@@ -116,5 +119,42 @@ public class NetworkedPlayerMovement : NetworkBehaviour
 
         nextTagRequestTime = Time.time + localTagRequestCooldown;
         playerData.RequestTagServerRpc(otherNetworkObject.OwnerClientId);
+    }
+
+    // --- Lobby input -----------------------------------------------------
+    private float nextProfileCycleTime;
+    private const float ProfileCycleCooldown = 0.25f; // same as local
+
+    private bool IsInLobby()
+    {
+        return NetworkedGameManager.Instance != null &&
+               !NetworkedGameManager.Instance.gameStarted.Value;
+    }
+
+    private void HandleProfileCycleInput()
+    {
+        if (!IsInLobby() || playerData.isReady.Value) return;
+        if (Time.time < nextProfileCycleTime) return;
+
+        if (moveInput.x > 0.5f)
+        {
+            playerData.RequestCycleProfileServerRpc(1);
+            nextProfileCycleTime = Time.time + ProfileCycleCooldown;
+        }
+        else if (moveInput.x < -0.5f)
+        {
+            playerData.RequestCycleProfileServerRpc(-1);
+            nextProfileCycleTime = Time.time + ProfileCycleCooldown;
+        }
+    }
+
+    // Mirrors PlayerMovement.OnMove: moving while frozen plays the card feedback.
+    private void OnMovePerformed(InputAction.CallbackContext context)
+    {
+        if (playerData.canMove.Value || !IsInLobby()) return;
+        if (NetworkedPlayerManager.Instance == null) return;
+
+        NetworkedReadyUI readyUI = NetworkedPlayerManager.Instance.GetReadyUISlot(playerData.slotIndex.Value);
+        if (readyUI != null) readyUI.PlayNudgeFeedback(playerData.slotIndex.Value);
     }
 }

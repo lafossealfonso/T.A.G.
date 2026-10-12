@@ -1,6 +1,7 @@
-using UnityEngine;
+using MoreMountains.Feedbacks;
 using System.Collections.Generic;
 using Unity.Netcode;
+using UnityEngine;
 
 public class NetworkedPlayerManager : MonoBehaviour
 {
@@ -10,6 +11,17 @@ public class NetworkedPlayerManager : MonoBehaviour
     [SerializeField] private List<PlayerProfile> playerProfiles;
 
     [SerializeField] private List<NetworkedScoreCardUI> scoreCardSlots;
+    [SerializeField] private List<NetworkedReadyUI> readyUISlots;
+    [SerializeField] private int minPlayersToStart = 2;
+
+    [Header("Player Labels")]
+    [SerializeField] private List<PlayerLabelUI> playerLabels;
+    [SerializeField] private Camera gameplayCamera;
+    [SerializeField] private Canvas labelCanvas;
+
+    [Header("Feedback")]
+    [SerializeField] private MMF_Player lobbyShakeFeedback; // online startSliderFeedback
+    [SerializeField] private GameObject menuParent;
 
     private readonly Dictionary<ulong, int> clientProfileIndex = new();
 
@@ -26,10 +38,82 @@ public class NetworkedPlayerManager : MonoBehaviour
         }
     }
 
+    private void OnEnable()
+    {
+        NetworkedGameManager.OnlineGameStarted += HandleOnlineGameStarted;
+    }
+
+    private void OnDisable()
+    {
+        NetworkedGameManager.OnlineGameStarted -= HandleOnlineGameStarted;
+    }
+
+    // Online version of the first lines of local StartGame().
+    // Runs on every machine, because gameStarted syncs to everyone.
+    private void HandleOnlineGameStarted(bool started)
+    {
+        if (!started || menuParent == null) return;
+
+        MMF_Player menuParentFeedbackPlayer = menuParent.GetComponent<MMF_Player>();
+        if (menuParentFeedbackPlayer != null) menuParentFeedbackPlayer.PlayFeedbacks();
+    }
+
+    public void ShakeUI()
+    {
+        if (lobbyShakeFeedback != null) lobbyShakeFeedback.PlayFeedbacks();
+    }
+
+    public void ServerCycleProfile(ulong clientId, int direction)
+    {
+        if (!NetworkManager.Singleton.IsServer) return;
+
+        // Never trust values from a client: only +1 or -1 is valid.
+        if (direction != 1 && direction != -1) return;
+
+        if (NetworkedGameManager.Instance != null &&
+            NetworkedGameManager.Instance.gameStarted.Value) return;
+
+        if (!clientProfileIndex.TryGetValue(clientId, out int current)) return;
+
+        if (!NetworkManager.Singleton.ConnectedClients.TryGetValue(clientId, out var client)) return;
+        NetworkObject playerObject = client.PlayerObject;
+        if (playerObject == null) return;
+
+        NetworkedPlayerData playerData = playerObject.GetComponent<NetworkedPlayerData>();
+        if (playerData == null || playerData.isReady.Value) return; // ready locks the profile
+
+        int count = playerProfiles.Count;
+
+        // Same search as local CycleProfile: walk in the requested direction
+        // until we find a profile nobody else has.
+        for (int i = 1; i <= count; i++)
+        {
+            int next = (current + direction * i + count) % count;
+
+            if (!clientProfileIndex.ContainsValue(next))
+            {
+                clientProfileIndex[clientId] = next;
+                playerData.ServerSetProfileIndex(next);
+                return;
+            }
+        }
+    }
+
     private void Start()
     {
         NetworkManager.Singleton.OnClientConnectedCallback += HandleClientConnected;
         NetworkManager.Singleton.OnClientDisconnectCallback += HandleClientDisconnected;
+
+        foreach (PlayerLabelUI label in playerLabels)
+        {
+            label.Setup(gameplayCamera, labelCanvas);
+        }
+    }
+
+    public PlayerLabelUI GetLabel(int index)
+    {
+        if (index < 0 || index >= playerLabels.Count) return null;
+        return playerLabels[index];
     }
 
     private void OnDestroy()
@@ -141,4 +225,38 @@ public class NetworkedPlayerManager : MonoBehaviour
 
         return 0;
     }
+
+    public NetworkedReadyUI GetReadyUISlot(int index)
+    {
+        if (index < 0 || index >= readyUISlots.Count) return null;
+        return readyUISlots[index];
+    }
+
+    public void ServerNotifyPlayerReady(ulong clientId)
+    {
+        if (!NetworkManager.Singleton.IsServer) return;
+        if (NetworkManager.Singleton.ConnectedClients.Count < minPlayersToStart) return;
+
+        // Everyone must be ready before we start.
+        foreach (var kvp in NetworkManager.Singleton.ConnectedClients)
+        {
+            NetworkObject obj = kvp.Value.PlayerObject;
+            if (obj == null) return;
+
+            NetworkedPlayerData data = obj.GetComponent<NetworkedPlayerData>();
+            if (data == null || !data.isReady.Value) return;
+        }
+
+        foreach (var kvp in NetworkManager.Singleton.ConnectedClients)
+        {
+            kvp.Value.PlayerObject.GetComponent<NetworkedPlayerData>().ServerSetCanMove(true);
+        }
+
+        if (NetworkedGameManager.Instance != null)
+            NetworkedGameManager.Instance.ServerStartGame();
+    }
+
+
+
+
 }

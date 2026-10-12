@@ -28,21 +28,12 @@ public class OnlineBasic_PlayerScoreCard : NetworkBehaviour
 
         if (playerData.isIt.Value)
         {
-            scoreValue.Value = Mathf.Min(
-                maxScore, scoreValue.Value + fillSpeed * Time.fixedDeltaTime);
-
-            if (scoreValue.Value >= maxScore)
-            {
-                hasTriggeredWin = true;
-                // TODO: once BasicGameMode/GameManager is converted, trigger
-                // the real networked win sequence here instead of just logging.
-                Debug.Log($"[Score] Client {OwnerClientId} reached max score.");
-            }
-            else
-            {
-                scoreValue.Value = Mathf.Max(
-                    0f, scoreValue.Value - fillSpeed * drainSpeedMultiplier * Time.fixedDeltaTime);
-            }
+            scoreValue.Value = Mathf.Min(maxScore, scoreValue.Value + fillSpeed * Time.fixedDeltaTime);
+            if (scoreValue.Value >= maxScore) { hasTriggeredWin = true; /* win logic */ }
+        }
+        else
+        {
+            scoreValue.Value = Mathf.Max(0f, scoreValue.Value - fillSpeed * drainSpeedMultiplier * Time.fixedDeltaTime);
         }
     }
 

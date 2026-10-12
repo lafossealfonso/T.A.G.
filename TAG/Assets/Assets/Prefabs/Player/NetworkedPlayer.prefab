@@ -620,7 +620,15 @@ MonoBehaviour:
     m_InternalValue: 1
   profileIndex:
     m_InternalValue: -1
+  slotIndex:
+    m_InternalValue: -1
+  isReady:
+    m_InternalValue: 0
   itIndicator: {fileID: 2246180133258608889}
+  playerVisual: {fileID: 7779381170269045859}
+  directionIndicator: {fileID: 9190998737354358912}
+  trail: {fileID: 8436401610450748615}
+  lightObject: {fileID: 5398569242546408400}
 --- !u!114 &976026684148196506
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -637,6 +645,7 @@ MonoBehaviour:
   moveSpeed: 2
   rotationSpeed: 30
   moveAction: {fileID: -1680190386980627800, guid: 052faaac586de48259a63d0c4782560b, type: 3}
+  readyAction: {fileID: -704496826298494302, guid: 32630a4e8d9f78f4aa1430fb62ec391b, type: 3}
   localTagRequestCooldown: 0.5
 --- !u!50 &8141301608024371217
 Rigidbody2D:
@@ -840,7 +849,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &635896406643909566
 Transform:
   m_ObjectHideFlags: 0
