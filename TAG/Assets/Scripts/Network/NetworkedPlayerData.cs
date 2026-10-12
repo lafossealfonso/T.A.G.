@@ -77,6 +77,12 @@ public class NetworkedPlayerData : NetworkBehaviour
             PlayerLabelUI label = NetworkedPlayerManager.Instance.GetLabel(slotIndex.Value);
             if (label != null) label.ClearPlayer();
         }
+
+        if (NetworkedPlayerManager.Instance != null && slotIndex.Value >= 0)
+        {
+            NetworkedPlayerManager.Instance.ReleaseScoreCardSlot(
+                slotIndex.Value, GetComponent<OnlineBasic_PlayerScoreCard>());
+        }
     }
 
     private void HandleIsItChanged(bool previousValue, bool newValue)

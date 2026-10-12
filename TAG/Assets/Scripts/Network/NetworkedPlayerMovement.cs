@@ -28,6 +28,8 @@ public class NetworkedPlayerMovement : NetworkBehaviour
     {
         rb = GetComponent<Rigidbody2D>();
         playerData = GetComponent<NetworkedPlayerData>();
+        NetworkedReadyUI readyUI = NetworkedPlayerManager.Instance.GetReadyUISlot(playerData.slotIndex.Value);
+        if (readyUI != null) readyUI.PlayJoinFeedback(playerData.slotIndex.Value);
     }
 
     public override void OnNetworkSpawn()
@@ -133,16 +135,23 @@ public class NetworkedPlayerMovement : NetworkBehaviour
 
     private void HandleProfileCycleInput()
     {
+        if (moveInput != Vector2.zero)
+            Debug.Log($"[Cycle] input={moveInput} inLobby={IsInLobby()} " +
+                      $"ready={playerData.isReady.Value} " +
+                      $"managerNull={NetworkedGameManager.Instance == null}");
+
         if (!IsInLobby() || playerData.isReady.Value) return;
         if (Time.time < nextProfileCycleTime) return;
 
         if (moveInput.x > 0.5f)
         {
+            Debug.Log("[Cycle] sending +1");
             playerData.RequestCycleProfileServerRpc(1);
             nextProfileCycleTime = Time.time + ProfileCycleCooldown;
         }
         else if (moveInput.x < -0.5f)
         {
+            Debug.Log("[Cycle] sending -1");
             playerData.RequestCycleProfileServerRpc(-1);
             nextProfileCycleTime = Time.time + ProfileCycleCooldown;
         }

@@ -97,6 +97,8 @@ public class NetworkedPlayerManager : MonoBehaviour
                 return;
             }
         }
+
+        Debug.Log($"[Cycle][Server] request from {clientId}, direction {direction}");
     }
 
     private void Start()
@@ -108,6 +110,21 @@ public class NetworkedPlayerManager : MonoBehaviour
         {
             label.Setup(gameplayCamera, labelCanvas);
         }
+
+        for (int i = 0; i < scoreCardSlots.Count; i++)
+        {
+            if (scoreCardSlots[i] != null)
+                scoreCardSlots[i].gameObject.SetActive(i < minPlayersToStart);
+        }
+    }
+
+    public void ReleaseScoreCardSlot(int index, OnlineBasic_PlayerScoreCard owner)
+    {
+        NetworkedScoreCardUI slot = GetScoreCardSlot(index);
+        if (slot == null || !slot.IsBoundTo(owner)) return; // slot may already belong to someone else
+
+        slot.ClearPlayer();
+        slot.gameObject.SetActive(index < minPlayersToStart);
     }
 
     public PlayerLabelUI GetLabel(int index)
