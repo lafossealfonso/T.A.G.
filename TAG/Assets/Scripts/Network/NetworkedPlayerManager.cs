@@ -53,9 +53,10 @@ public class NetworkedPlayerManager : MonoBehaviour
     private void HandleOnlineGameStarted(bool started)
     {
         if (!started || menuParent == null) return;
-
-        MMF_Player menuParentFeedbackPlayer = menuParent.GetComponent<MMF_Player>();
-        if (menuParentFeedbackPlayer != null) menuParentFeedbackPlayer.PlayFeedbacks();
+        menuParent.SetActive(false); 
+        //add MMF feedback
+        //MMF_Player menuParentFeedbackPlayer = menuParent.GetComponent<MMF_Player>();
+        //if (menuParentFeedbackPlayer != null) menuParentFeedbackPlayer.PlayFeedbacks();
     }
 
     public void ShakeUI()

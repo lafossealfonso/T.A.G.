@@ -2544,7 +2544,7 @@ MonoBehaviour:
   gameplayCamera: {fileID: 911476742735503254}
   labelCanvas: {fileID: 3248882873710827093}
   lobbyShakeFeedback: {fileID: 15994188}
-  menuParent: {fileID: 0}
+  menuParent: {fileID: 1385341315}
 --- !u!4 &1739229987
 Transform:
   m_ObjectHideFlags: 0
