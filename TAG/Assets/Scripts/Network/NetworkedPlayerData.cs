@@ -1,5 +1,6 @@
 using MoreMountains.Feedbacks;
 using Unity.Netcode;
+using Unity.Netcode.Components;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.DualShock;
@@ -45,12 +46,28 @@ public class NetworkedPlayerData : NetworkBehaviour
     [SerializeField] private TrailRenderer trail;
     [SerializeField] private HardLight2D lightObject;
 
-    
+    public NetworkVariable<Color> teleportColor = new NetworkVariable<Color>(
+    Color.white,
+    NetworkVariableReadPermission.Everyone,
+    NetworkVariableWritePermission.Server);
+
+    public NetworkVariable<bool> isTeleporting = new NetworkVariable<bool>(
+        false,
+        NetworkVariableReadPermission.Everyone,
+        NetworkVariableWritePermission.Server);
+
+    [SerializeField] private SpriteRenderer teleportingVisual;
+    [SerializeField] private Collider2D playerCollider; // falls back to GetComponent in Awake
+
+    private float teleportDeadline;
+
+
     private Sprite defaultSprite;
 
     private void Awake()
     {
         if (playerVisual != null) defaultSprite = playerVisual.sprite;
+        if (playerCollider == null) playerCollider = GetComponent<Collider2D>();
     }
 
 
@@ -64,6 +81,14 @@ public class NetworkedPlayerData : NetworkBehaviour
         HandleIsItChanged(false, isIt.Value);
         HandleProfileChanged(-1, profileIndex.Value);
         HandleSlotIndexChanged(-1, slotIndex.Value);
+
+        if (NetworkedPlayerManager.Instance != null)
+            NetworkedPlayerManager.Instance.AddToTargetGroup(transform);
+
+        isTeleporting.OnValueChanged += HandleTeleportingChanged;
+        if (isTeleporting.Value) HandleTeleportingChanged(false, true); // joined mid-teleport
+        if (NetworkedPlayerManager.Instance != null)
+            NetworkedPlayerManager.Instance.PlayerSpawned(this);
     }
 
     public override void OnNetworkDespawn()
@@ -83,15 +108,21 @@ public class NetworkedPlayerData : NetworkBehaviour
             NetworkedPlayerManager.Instance.ReleaseScoreCardSlot(
                 slotIndex.Value, GetComponent<OnlineBasic_PlayerScoreCard>());
         }
+
+        if (NetworkedPlayerManager.Instance != null)
+            NetworkedPlayerManager.Instance.RemoveFromTargetGroup(transform);
+
+        isTeleporting.OnValueChanged -= HandleTeleportingChanged;
+        if (NetworkedPlayerManager.Instance != null)
+            NetworkedPlayerManager.Instance.PlayerDespawned(this);
+
     }
 
     private void HandleIsItChanged(bool previousValue, bool newValue)
     {
         Debug.Log($"[Tag][Visual] isIt changed on {gameObject.name}: {previousValue} -> {newValue}. itIndicator assigned: {itIndicator != null}");
-        if (itIndicator != null)
-        {
-            itIndicator.SetActive(newValue);
-        }
+
+        if (itIndicator != null) itIndicator.SetActive(newValue && !isTeleporting.Value);
 
         if (newValue && slotIndex.Value >= 0 && NetworkedPlayerManager.Instance != null)
         {
@@ -231,6 +262,50 @@ public class NetworkedPlayerData : NetworkBehaviour
         isReady.Value = value;
     }
 
+    private void HandleTeleportingChanged(bool previous, bool current)
+    {
+        SetTeleportVisual(current, teleportColor.Value);
+    }
+
+    // Online version of PlayerMovement.SetTeleportVisual, run on every machine.
+    private void SetTeleportVisual(bool teleporting, Color color)
+    {
+        if (playerVisual != null) playerVisual.enabled = !teleporting;
+        if (directionIndicator != null) directionIndicator.enabled = !teleporting;
+        if (playerCollider != null) playerCollider.enabled = !teleporting;
+        if (lightObject != null) lightObject.gameObject.SetActive(teleporting);
+
+        if (teleportingVisual != null)
+        {
+            teleportingVisual.color = color;
+            teleportingVisual.enabled = teleporting;
+        }
+
+        if (itIndicator != null) itIndicator.SetActive(!teleporting && isIt.Value);
+    }
+
+    public void ServerSetTeleporting(bool value, Color color, float expectedDuration)
+    {
+        if (!IsServer) return;
+        teleportColor.Value = color;
+        isTeleporting.Value = value;
+        teleportDeadline = Time.time + expectedDuration + 1.5f;
+    }
+
+    [ServerRpc]
+    public void TeleportFinishedServerRpc()
+    {
+        if (isTeleporting.Value) isTeleporting.Value = false;
+    }
+
+    // Safety net: if the owner's "finished" message is ever lost, don't leave
+    // a player invisible and untouchable forever.
+    private void Update()
+    {
+        if (IsServer && isTeleporting.Value && Time.time > teleportDeadline)
+            isTeleporting.Value = false;
+    }
+
     // --- Tagging -----------------------------------------------------------
 
     [ServerRpc]
@@ -265,6 +340,12 @@ public class NetworkedPlayerData : NetworkBehaviour
             return;
         }
 
+        if (isTeleporting.Value || taggedPlayerData.isTeleporting.Value)
+        {
+            Debug.Log("[Tag][Server] REJECTED: someone is mid-teleport.");
+            return;
+        }
+
         if (!taggedPlayerData.ServerCanTag())
         {
             Debug.Log("[Tag][Server] REJECTED: target is still on cooldown.");
@@ -286,8 +367,8 @@ public class NetworkedPlayerData : NetworkBehaviour
         taggedPlayerData.ServerStartTagCooldown();
 
         Debug.Log($"[Tag][Server] SUCCESS: tag applied. Tagger isIt is now {isIt.Value}, target isIt is now {taggedPlayerData.isIt.Value}");
-        // TODO: once BasicGameMode is converted, broadcast the tagged-feedback
-        // (VFX/SFX) here -- likely a ClientRpc, mirroring old GameManager.PlayerTagged.
+        ServerBroadcastTagEffects(OwnerClientId, taggedClientId);
+        taggedPlayerData.ServerRespawnOwner();
     }
 
     private const float TagCooldownDuration = 0.5f;
@@ -319,5 +400,110 @@ public class NetworkedPlayerData : NetworkBehaviour
     {
         if (NetworkedPlayerManager.Instance != null)
             NetworkedPlayerManager.Instance.ServerCycleProfile(OwnerClientId, direction);
+    }
+
+    // --- Tag effects -----------------------------------------------------
+
+    public const ulong NoClient = ulong.MaxValue; // "nobody", used for star pickups
+
+    // Server calls this; the RPC then runs on all clients.
+    public void ServerBroadcastTagEffects(ulong taggerClientId, ulong taggedClientId)
+    {
+        if (!IsServer) return;
+        TagEffectsClientRpc(taggerClientId, taggedClientId);
+    }
+
+    [ClientRpc]
+    private void TagEffectsClientRpc(ulong taggerClientId, ulong taggedClientId)
+    {
+        if (NetworkedGameMode.Instance != null)
+            NetworkedGameMode.Instance.PlayTagEffects();
+
+        // Haptics are about THIS machine's controller, so each client checks
+        // whether it is the tagger or the tagged player.
+        ulong localId = NetworkManager.Singleton.LocalClientId;
+
+        if (localId == taggerClientId) PlayLocalHaptic(HapticType.BecameIt);
+        else if (localId == taggedClientId) PlayLocalHaptic(HapticType.GotTagged);
+    }
+
+    private void PlayLocalHaptic(HapticType type)
+    {
+        if (HapticsManager.Instance == null) return;
+        HapticsManager.Instance.Play(Gamepad.current, type); // null (keyboard) is ignored by Play
+    }
+
+    // Called on the TAGGED player's object. Sends only to that player's owner.
+    public void ServerRespawnOwner()
+    {
+        if (!IsServer) return;
+
+        Vector3 target = NetworkedGameMode.Instance != null
+            ? NetworkedGameMode.Instance.RespawnPosition
+            : transform.position;
+
+        ServerTeleportOwnerTo(target);
+    }
+
+    public void ServerTeleportOwnerTo(Vector3 position)
+    {
+        if (!IsServer) return;
+
+        ClientRpcParams ownerOnly = new ClientRpcParams
+        {
+            Send = new ClientRpcSendParams { TargetClientIds = new[] { OwnerClientId } }
+        };
+
+        TeleportToClientRpc(position, ownerOnly);
+    }
+
+    [ClientRpc]
+    private void TeleportToClientRpc(Vector3 target, ClientRpcParams clientRpcParams = default)
+    {
+        if (!IsOwner) return;
+
+        Rigidbody2D rb = GetComponent<Rigidbody2D>();
+        if (rb != null) rb.linearVelocity = Vector2.zero;
+
+        NetworkTransform netTransform = GetComponent<NetworkTransform>();
+        if (netTransform != null)
+            netTransform.Teleport(target, transform.rotation, transform.localScale);
+        else
+            transform.position = target;
+
+        if (rb != null) rb.position = target;
+    }
+
+    [ClientRpc]
+    private void RespawnClientRpc(ClientRpcParams clientRpcParams = default)
+    {
+        if (!IsOwner) return; // only the owner may move this player
+
+        Vector3 target = NetworkedGameMode.Instance != null
+            ? NetworkedGameMode.Instance.RespawnPosition
+            : transform.position;
+
+        Rigidbody2D rb = GetComponent<Rigidbody2D>();
+        if (rb != null) rb.linearVelocity = Vector2.zero;
+
+        // Teleport tells NetworkTransform "this is a jump, don't smooth it".
+        NetworkTransform netTransform = GetComponent<NetworkTransform>();
+        if (netTransform != null)
+            netTransform.Teleport(target, transform.rotation, transform.localScale);
+        else
+            transform.position = target;
+
+        if (rb != null) rb.position = target;
+    }
+
+    public NetworkVariable<int> roundWins = new NetworkVariable<int>(
+    0,
+    NetworkVariableReadPermission.Everyone,
+    NetworkVariableWritePermission.Server);
+
+    public void ServerAddRoundWin()
+    {
+        if (!IsServer) return;
+        roundWins.Value += 1;
     }
 }

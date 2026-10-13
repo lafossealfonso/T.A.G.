@@ -2,6 +2,7 @@ using System.Globalization;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using System.Collections;
 
 
 [RequireComponent(typeof(Rigidbody2D))]
@@ -58,7 +59,11 @@ public class NetworkedPlayerMovement : NetworkBehaviour
     private void Update()
     {
         if (!IsOwner) return;
-
+        if (isRidingBeam)
+        {
+            rb.linearVelocity = Vector2.zero;
+            return;
+        }
         moveInput = moveAction.action.ReadValue<Vector2>();
         HandleProfileCycleInput();
     }
@@ -101,6 +106,48 @@ public class NetworkedPlayerMovement : NetworkBehaviour
     private void OnReadyPerformed(InputAction.CallbackContext context)
     {
         playerData.RequestReadyServerRpc();
+    }
+
+    // --- Portal teleport ---------------------------------------------------
+    [Header("Portal Teleport")]
+    [SerializeField] private float exitSnapDuration = 0.1f;
+    private bool isRidingBeam;
+
+    public bool IsTeleporting
+    {
+        get { return isRidingBeam || playerData.isTeleporting.Value; }
+    }
+
+    public void TeleportAlongLine(Vector2 lineStart, Vector2 lineEnd, Vector2 exitPosition, float duration)
+    {
+        if (!IsOwner || isRidingBeam) return;
+        StartCoroutine(TeleportAlongLineRoutine(lineStart, lineEnd, exitPosition, duration));
+    }
+
+    private IEnumerator TeleportAlongLineRoutine(Vector2 lineStart, Vector2 lineEnd,
+                                                 Vector2 exitPosition, float duration)
+    {
+        isRidingBeam = true;
+        rb.linearVelocity = Vector2.zero;
+
+        rb.MovePosition(lineStart);                                 // snap onto the portal
+        yield return LerpAlong(lineStart, lineEnd, duration);       // ride the beam
+        yield return LerpAlong(lineEnd, exitPosition, exitSnapDuration); // settle at the exit
+
+        isRidingBeam = false;
+        playerData.TeleportFinishedServerRpc();
+    }
+
+    private IEnumerator LerpAlong(Vector2 from, Vector2 to, float duration)
+    {
+        float elapsed = 0f;
+        while (elapsed < duration)
+        {
+            elapsed += Time.deltaTime;
+            rb.MovePosition(Vector2.Lerp(from, to, Mathf.Clamp01(elapsed / duration)));
+            yield return null;
+        }
+        rb.MovePosition(to);
     }
 
     // --- Tagging ---------------------------------------------------------

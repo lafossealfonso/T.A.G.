@@ -23,18 +23,32 @@ public class OnlineBasic_PlayerScoreCard : NetworkBehaviour
 
     private void FixedUpdate()
     {
-        if (!IsServer) return;
-        if (hasTriggeredWin) return;
+        if (!IsServer || hasTriggeredWin) return;
 
         if (playerData.isIt.Value)
         {
-            scoreValue.Value = Mathf.Min(maxScore, scoreValue.Value + fillSpeed * Time.fixedDeltaTime);
-            if (scoreValue.Value >= maxScore) { hasTriggeredWin = true; /* win logic */ }
+            scoreValue.Value = Mathf.Min(
+                maxScore, scoreValue.Value + fillSpeed * Time.fixedDeltaTime);
+
+            if (scoreValue.Value >= maxScore)
+            {
+                hasTriggeredWin = true;
+                if (NetworkedGameManager.Instance != null)
+                    NetworkedGameManager.Instance.ServerPlayerReachedMaxScore(OwnerClientId);
+            }
         }
         else
         {
-            scoreValue.Value = Mathf.Max(0f, scoreValue.Value - fillSpeed * drainSpeedMultiplier * Time.fixedDeltaTime);
+            scoreValue.Value = Mathf.Max(
+                0f, scoreValue.Value - fillSpeed * drainSpeedMultiplier * Time.fixedDeltaTime);
         }
+    }
+
+
+    public void ServerMultiplyFillSpeed(float factor)
+    {
+        if (!IsServer) return;
+        fillSpeed *= factor;
     }
 
     public void ServerResetScore()

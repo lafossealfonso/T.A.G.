@@ -1,7 +1,9 @@
 using MoreMountains.Feedbacks;
 using System.Collections.Generic;
+using Unity.Cinemachine;
 using Unity.Netcode;
 using UnityEngine;
+
 
 public class NetworkedPlayerManager : MonoBehaviour
 {
@@ -22,6 +24,16 @@ public class NetworkedPlayerManager : MonoBehaviour
     [Header("Feedback")]
     [SerializeField] private MMF_Player lobbyShakeFeedback; // online startSliderFeedback
     [SerializeField] private GameObject menuParent;
+
+    [Header("Camera")]
+    [SerializeField] private CinemachineTargetGroup targetGroup;
+    [SerializeField] private float targetWeight = 0.5f; // same values local mode uses
+    [SerializeField] private float targetRadius = 1f;
+
+    [SerializeField] private float multiplayerFillSpeedMultiplier = 1.5f;
+    private readonly HashSet<NetworkedPlayerData> spawnedPlayers = new HashSet<NetworkedPlayerData>();
+
+    public int PlayerCount { get { return spawnedPlayers.Count; } }
 
     private readonly Dictionary<ulong, int> clientProfileIndex = new();
 
@@ -111,21 +123,27 @@ public class NetworkedPlayerManager : MonoBehaviour
         {
             label.Setup(gameplayCamera, labelCanvas);
         }
-
-        for (int i = 0; i < scoreCardSlots.Count; i++)
-        {
-            if (scoreCardSlots[i] != null)
-                scoreCardSlots[i].gameObject.SetActive(i < minPlayersToStart);
-        }
     }
 
+    public void PlayerSpawned(NetworkedPlayerData player)
+    {
+        spawnedPlayers.Add(player);
+        if (NetworkedGameMode.Instance != null)
+            NetworkedGameMode.Instance.RefreshScoreKeepers(spawnedPlayers.Count);
+    }
+
+    public void PlayerDespawned(NetworkedPlayerData player)
+    {
+        spawnedPlayers.Remove(player);
+        if (NetworkedGameMode.Instance != null)
+            NetworkedGameMode.Instance.RefreshScoreKeepers(spawnedPlayers.Count);
+    }
     public void ReleaseScoreCardSlot(int index, OnlineBasic_PlayerScoreCard owner)
     {
         NetworkedScoreCardUI slot = GetScoreCardSlot(index);
         if (slot == null || !slot.IsBoundTo(owner)) return; // slot may already belong to someone else
 
-        slot.ClearPlayer();
-        slot.gameObject.SetActive(index < minPlayersToStart);
+        slot.ClearPlayer(); // back to the empty look; the card stays active
     }
 
     public PlayerLabelUI GetLabel(int index)
@@ -141,6 +159,51 @@ public class NetworkedPlayerManager : MonoBehaviour
         NetworkManager.Singleton.OnClientConnectedCallback -= HandleClientConnected;
         NetworkManager.Singleton.OnClientDisconnectCallback -= HandleClientDisconnected;
     }
+    public void ServerSetAllCanMove(bool value)
+    {
+        if (!NetworkManager.Singleton.IsServer) return;
+
+        foreach (var kvp in NetworkManager.Singleton.ConnectedClients)
+        {
+            NetworkObject obj = kvp.Value.PlayerObject;
+            if (obj == null) continue;
+
+            NetworkedPlayerData data = obj.GetComponent<NetworkedPlayerData>();
+            if (data != null) data.ServerSetCanMove(value);
+        }
+    }
+
+    public void ServerResetPlayersForNewRound()
+    {
+        if (!NetworkManager.Singleton.IsServer) return;
+
+        foreach (var kvp in NetworkManager.Singleton.ConnectedClients)
+        {
+            NetworkObject obj = kvp.Value.PlayerObject;
+            if (obj == null) continue;
+
+            NetworkedPlayerData data = obj.GetComponent<NetworkedPlayerData>();
+            if (data == null) continue;
+
+            data.ServerSetIsIt(false);
+
+            int slot = data.slotIndex.Value;
+            if (slot >= 0 && slot < spawnPoints.Count)
+                data.ServerTeleportOwnerTo(spawnPoints[slot].position);
+
+            OnlineBasic_PlayerScoreCard card = obj.GetComponent<OnlineBasic_PlayerScoreCard>();
+            if (card != null) card.ServerResetScore();
+        }
+    }
+
+    public void TurnOffPlayerLabels(bool toState)
+    {
+        foreach (PlayerLabelUI label in playerLabels)
+        {
+            if (label != null) label.gameObject.SetActive(toState);
+        }
+    }
+
 
     private void HandleClientConnected(ulong clientId)
     {
@@ -252,6 +315,8 @@ public class NetworkedPlayerManager : MonoBehaviour
 
     public void ServerNotifyPlayerReady(ulong clientId)
     {
+        if (NetworkedGameManager.Instance != null && NetworkedGameManager.Instance.gameStarted.Value) return;
+
         if (!NetworkManager.Singleton.IsServer) return;
         if (NetworkManager.Singleton.ConnectedClients.Count < minPlayersToStart) return;
 
@@ -264,6 +329,16 @@ public class NetworkedPlayerManager : MonoBehaviour
             NetworkedPlayerData data = obj.GetComponent<NetworkedPlayerData>();
             if (data == null || !data.isReady.Value) return;
         }
+        int playerCount = NetworkManager.Singleton.ConnectedClients.Count;
+        if (playerCount > 2)
+        {
+            float factor = Mathf.Pow(multiplayerFillSpeedMultiplier, playerCount - 2);
+            foreach (var kvp in NetworkManager.Singleton.ConnectedClients)
+            {
+                OnlineBasic_PlayerScoreCard card = kvp.Value.PlayerObject.GetComponent<OnlineBasic_PlayerScoreCard>();
+                if (card != null) card.ServerMultiplyFillSpeed(factor);
+            }
+        }
 
         foreach (var kvp in NetworkManager.Singleton.ConnectedClients)
         {
@@ -272,6 +347,23 @@ public class NetworkedPlayerManager : MonoBehaviour
 
         if (NetworkedGameManager.Instance != null)
             NetworkedGameManager.Instance.ServerStartGame();
+    }
+
+    //CAMERA GROUP LOGIC
+    public void AddToTargetGroup(Transform target)
+    {
+        if (targetGroup == null || target == null) return;
+        if (targetGroup.FindMember(target) >= 0) return; // already in the group
+
+        targetGroup.AddMember(target, targetWeight, targetRadius);
+    }
+
+    public void RemoveFromTargetGroup(Transform target)
+    {
+        if (targetGroup == null || target == null) return;
+        if (targetGroup.FindMember(target) < 0) return;
+
+        targetGroup.RemoveMember(target);
     }
 
 

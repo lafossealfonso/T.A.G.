@@ -12,17 +12,27 @@ public class NetworkedStar : NetworkBehaviour
     public override void OnNetworkSpawn()
     {
         isAvailable.OnValueChanged += HandleAvailabilityChanged;
-        HandleAvailabilityChanged(true, isAvailable.Value);
+        HandleAvailabilityChanged(true, isAvailable.Value); // existing line; now also adds it to the camera
     }
 
     public override void OnNetworkDespawn()
     {
         isAvailable.OnValueChanged -= HandleAvailabilityChanged;
+        UpdateCameraMembership(false);
     }
 
     private void HandleAvailabilityChanged(bool previousValue, bool newValue)
     {
         gameObject.SetActive(newValue);
+        UpdateCameraMembership(newValue);
+    }
+
+    private void UpdateCameraMembership(bool inGroup)
+    {
+        if (NetworkedPlayerManager.Instance == null) return;
+
+        if (inGroup) NetworkedPlayerManager.Instance.AddToTargetGroup(transform);
+        else NetworkedPlayerManager.Instance.RemoveFromTargetGroup(transform);
     }
 
     private void OnTriggerEnter2D(Collider2D other)
@@ -56,8 +66,12 @@ public class NetworkedStar : NetworkBehaviour
         NetworkedPlayerData playerData = playerObject.GetComponent<NetworkedPlayerData>();
         if (playerData == null) return;
 
+        if (playerData.isTeleporting.Value) return;
+
         isAvailable.Value = false;
         playerData.ServerSetIsIt(true);
+
+        playerData.ServerBroadcastTagEffects(requestingClientId, NetworkedPlayerData.NoClient);
     }
 
     // TODO: once BasicGameMode is converted, call this from the server-side

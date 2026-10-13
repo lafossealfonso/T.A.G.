@@ -1,6 +1,7 @@
 using System;
 using Unity.Netcode;
 using UnityEngine;
+using System.Collections;
 
 public class NetworkedGameManager : NetworkBehaviour
 {
@@ -14,6 +15,11 @@ public class NetworkedGameManager : NetworkBehaviour
         false,
         NetworkVariableReadPermission.Everyone,
         NetworkVariableWritePermission.Server);
+
+    [Header("Round Reset")]
+    [SerializeField] private NetworkedStar star;
+    private int roundsPlayed;
+    private bool roundResolving;
 
     private void Awake()
     {
@@ -43,5 +49,60 @@ public class NetworkedGameManager : NetworkBehaviour
     {
         if (!IsServer) return;
         gameStarted.Value = true;
+    }
+
+    public void ServerPlayerReachedMaxScore(ulong winnerClientId)
+    {
+        if (!IsServer || roundResolving) return; // also stops two "wins" in one tick
+        if (NetworkedGameMode.Instance == null || NetworkedPlayerManager.Instance == null) return;
+
+        if (!NetworkManager.Singleton.ConnectedClients.TryGetValue(winnerClientId, out var client)) return;
+        NetworkObject winnerObject = client.PlayerObject;
+        if (winnerObject == null) return;
+
+        NetworkedPlayerData winnerData = winnerObject.GetComponent<NetworkedPlayerData>();
+        if (winnerData == null) return;
+
+        roundResolving = true;
+
+        NetworkedPlayerManager.Instance.ServerSetAllCanMove(false);
+        winnerData.ServerSetIsIt(false);
+        winnerData.ServerAddRoundWin();
+        roundsPlayed++;
+
+        // Same maths as local: wins >= limit / 2 (float division).
+        bool gameOver = winnerData.roundWins.Value >= NetworkedGameMode.Instance.RoundsToWin;
+
+        Debug.Log($"[Round] winner client {winnerClientId}, wins {winnerData.roundWins.Value}, " +
+                  $"round {roundsPlayed}, gameOver {gameOver}");
+
+        RoundWonClientRpc(winnerData.profileIndex.Value, roundsPlayed, gameOver);
+
+        // On game over, roundResolving stays true so no further round can start.
+        if (!gameOver) StartCoroutine(ServerRoundResetRoutine());
+    }
+
+    [ClientRpc]
+    private void RoundWonClientRpc(int winnerProfileIndex, int roundNumber, bool gameOver)
+    {
+        if (NetworkedGameMode.Instance != null)
+            NetworkedGameMode.Instance.ShowRoundWon(winnerProfileIndex, roundNumber, gameOver);
+    }
+
+    // Replaces local's MidCallbackRoutine + RoundSplashEnded.
+    private IEnumerator ServerRoundResetRoutine()
+    {
+        float splash = NetworkedGameMode.Instance.RoundSplashDuration;
+        if (splash <= 0f) splash = 2f; // fallback if the MMF reports no duration
+
+        yield return new WaitForSeconds(splash * 0.5f);   // splash covers the screen here
+
+        NetworkedPlayerManager.Instance.ServerResetPlayersForNewRound();
+        if (star != null) star.ServerResetStar();
+
+        yield return new WaitForSeconds(splash * 0.5f);
+
+        NetworkedPlayerManager.Instance.ServerSetAllCanMove(true);
+        roundResolving = false;
     }
 }

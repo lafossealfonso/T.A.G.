@@ -267,7 +267,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1895084470682744678}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: -553817549, guid: a18d607b5ef4c264aab6c335019691c7, type: 3}
   m_Name: 
@@ -629,6 +629,12 @@ MonoBehaviour:
   directionIndicator: {fileID: 9190998737354358912}
   trail: {fileID: 8436401610450748615}
   lightObject: {fileID: 5398569242546408400}
+  teleportColor:
+    m_InternalValue: {r: 1, g: 1, b: 1, a: 1}
+  isTeleporting:
+    m_InternalValue: 0
+  teleportingVisual: {fileID: 0}
+  playerCollider: {fileID: 0}
 --- !u!114 &976026684148196506
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -646,6 +652,7 @@ MonoBehaviour:
   rotationSpeed: 30
   moveAction: {fileID: -1680190386980627800, guid: 052faaac586de48259a63d0c4782560b, type: 3}
   readyAction: {fileID: -704496826298494302, guid: 32630a4e8d9f78f4aa1430fb62ec391b, type: 3}
+  exitSnapDuration: 0.1
   localTagRequestCooldown: 0.5
 --- !u!50 &8141301608024371217
 Rigidbody2D:
@@ -873,7 +880,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5874838553376008426}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: -553817549, guid: a18d607b5ef4c264aab6c335019691c7, type: 3}
   m_Name: 
