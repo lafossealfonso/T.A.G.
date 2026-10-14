@@ -46,7 +46,7 @@ public class UIButtonFeedback : MonoBehaviour, IPointerEnterHandler, IPointerExi
     {
         onHoverFeedbackPlayer.PlayFeedbacks();
         if(displaylevel) levelDisplayScript.SetIndexTo(thisIndexInt);
-        rotatingDecorPlayer.PlayFeedbacks();
+        if(rotatingDecorPlayer != null) rotatingDecorPlayer.PlayFeedbacks();
     }
 
     public void HoverExit()

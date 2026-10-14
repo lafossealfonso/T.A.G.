@@ -82,13 +82,11 @@ public class NetworkedPlayerData : NetworkBehaviour
         HandleProfileChanged(-1, profileIndex.Value);
         HandleSlotIndexChanged(-1, slotIndex.Value);
 
-        if (NetworkedPlayerManager.Instance != null)
-            NetworkedPlayerManager.Instance.AddToTargetGroup(transform);
+        RegisterWithScene();
 
         isTeleporting.OnValueChanged += HandleTeleportingChanged;
         if (isTeleporting.Value) HandleTeleportingChanged(false, true); // joined mid-teleport
-        if (NetworkedPlayerManager.Instance != null)
-            NetworkedPlayerManager.Instance.PlayerSpawned(this);
+        
     }
 
     public override void OnNetworkDespawn()
@@ -505,5 +503,26 @@ public class NetworkedPlayerData : NetworkBehaviour
     {
         if (!IsServer) return;
         roundWins.Value += 1;
+    }
+
+    public void ServerResetForNewMatch()
+    {
+        if (!IsServer) return;
+        isReady.Value = false;
+        canMove.Value = false;
+        isIt.Value = false;
+        roundWins.Value = 0;
+        isTeleporting.Value = false;
+    }
+
+    // Everything that connects this player to the CURRENT scene's objects. Runs on spawn,
+    // and again after a reload, because players persist but scene objects don't.
+    public void RegisterWithScene()
+    {
+        if (NetworkedPlayerManager.Instance == null) return;
+
+        NetworkedPlayerManager.Instance.PlayerSpawned(this);
+        NetworkedPlayerManager.Instance.AddToTargetGroup(transform);
+        TryBindScoreCardSlot();
     }
 }

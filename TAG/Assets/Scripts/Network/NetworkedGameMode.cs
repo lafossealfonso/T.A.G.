@@ -3,6 +3,7 @@ using MoreMountains.Feedbacks;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using Unity.Netcode;
 
 public class NetworkedGameMode : MonoBehaviour
 {
@@ -37,10 +38,14 @@ public class NetworkedGameMode : MonoBehaviour
 
     private static readonly string[] RoundNames = { "ONE", "TWO", "THREE", "FOUR", "FIVE" };
 
+    [SerializeField] private FinalMenu finalMenu;
+
     private void Awake()
     {
         if (Instance == null) Instance = this;
-        else Destroy(gameObject);
+        else { Destroy(gameObject); return; }
+
+        if (roundFadePlayer != null) roundFadePlayer.Events.OnComplete.AddListener(ShowFinalMenu);
     }
 
     private void Start()
@@ -50,6 +55,21 @@ public class NetworkedGameMode : MonoBehaviour
         int players = NetworkedPlayerManager.Instance != null
             ? NetworkedPlayerManager.Instance.PlayerCount : 0;
         RefreshScoreKeepers(players);
+
+        // If the session ends underneath us (host quit, connection lost), go back to the menu.
+        if (NetworkManager.Singleton != null)
+            NetworkManager.Singleton.OnClientStopped += HandleClientStopped;
+    }
+
+    private void HandleClientStopped(bool wasHost)
+    {
+        if (finalMenu != null) finalMenu.MainMenu();
+    }
+
+    private void OnDestroy()
+    {
+        if (NetworkManager.Singleton != null)
+            NetworkManager.Singleton.OnClientStopped -= HandleClientStopped;
     }
 
     public void RefreshScoreKeepers(int playerCount)
@@ -82,8 +102,11 @@ public class NetworkedGameMode : MonoBehaviour
         scoreKeepers.RemoveAt(last);
     }
 
-    
 
+    private void ShowFinalMenu()
+    {
+        if (finalMenu != null) finalMenu.Show();
+    }
     public Vector3 RespawnPosition
     {
         get { return respawnPoint != null ? respawnPoint.position : Vector3.zero; }

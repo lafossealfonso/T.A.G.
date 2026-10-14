@@ -123,6 +123,25 @@ public class NetworkedPlayerManager : MonoBehaviour
         {
             label.Setup(gameplayCamera, labelCanvas);
         }
+
+        // After a rematch reload the players already exist; reconnect them to this scene.
+        foreach (NetworkedPlayerData existing in FindObjectsByType<NetworkedPlayerData>(FindObjectsSortMode.None))
+            existing.RegisterWithScene();
+
+        // The new manager starts with an empty profile table; rebuild it from the players.
+        if (NetworkManager.Singleton != null && NetworkManager.Singleton.IsServer)
+        {
+            clientProfileIndex.Clear();
+            foreach (var kvp in NetworkManager.Singleton.ConnectedClients)
+            {
+                NetworkObject obj = kvp.Value.PlayerObject;
+                if (obj == null) continue;
+
+                NetworkedPlayerData data = obj.GetComponent<NetworkedPlayerData>();
+                if (data != null && data.profileIndex.Value >= 0)
+                    clientProfileIndex[kvp.Key] = data.profileIndex.Value;
+            }
+        }
     }
 
     public void PlayerSpawned(NetworkedPlayerData player)
@@ -366,7 +385,32 @@ public class NetworkedPlayerManager : MonoBehaviour
         targetGroup.RemoveMember(target);
     }
 
+    public void ServerResetPlayersForNewMatch()
+    {
+        if (!NetworkManager.Singleton.IsServer) return;
 
+        foreach (var kvp in NetworkManager.Singleton.ConnectedClients)
+        {
+            NetworkObject obj = kvp.Value.PlayerObject;
+            if (obj == null) continue;
+
+            NetworkedPlayerData data = obj.GetComponent<NetworkedPlayerData>();
+            if (data == null) continue;
+
+            data.ServerResetForNewMatch();
+
+            int slot = data.slotIndex.Value;
+            if (slot >= 0 && slot < spawnPoints.Count)
+                data.ServerTeleportOwnerTo(spawnPoints[slot].position);
+
+            OnlineBasic_PlayerScoreCard card = obj.GetComponent<OnlineBasic_PlayerScoreCard>();
+            if (card != null)
+            {
+                card.ServerResetScore();
+                card.ServerResetFillSpeed();
+            }
+        }
+    }
 
 
 }

@@ -21,6 +21,8 @@ public class NetworkedGameManager : NetworkBehaviour
     private int roundsPlayed;
     private bool roundResolving;
 
+    private bool gameIsOver;
+
     private void Awake()
     {
         if (Instance == null) Instance = this;
@@ -79,7 +81,8 @@ public class NetworkedGameManager : NetworkBehaviour
         RoundWonClientRpc(winnerData.profileIndex.Value, roundsPlayed, gameOver);
 
         // On game over, roundResolving stays true so no further round can start.
-        if (!gameOver) StartCoroutine(ServerRoundResetRoutine());
+        if (gameOver) gameIsOver = true;
+        else StartCoroutine(ServerRoundResetRoutine());
     }
 
     [ClientRpc]
@@ -104,5 +107,20 @@ public class NetworkedGameManager : NetworkBehaviour
 
         NetworkedPlayerManager.Instance.ServerSetAllCanMove(true);
         roundResolving = false;
+    }
+
+    // Any player on the end screen can start a rematch. The server decides whether it's valid.
+    [ServerRpc(RequireOwnership = false)]
+    public void RequestReplayServerRpc()
+    {
+        if (!gameIsOver) return; // only valid on the end screen; also ignores repeat presses
+        gameIsOver = false;
+
+        NetworkedPlayerManager.Instance.ServerResetPlayersForNewMatch();
+
+        // Reloads the scene on every machine. Players persist; scene objects are rebuilt.
+        NetworkManager.Singleton.SceneManager.LoadScene(
+            UnityEngine.SceneManagement.SceneManager.GetActiveScene().name,
+            UnityEngine.SceneManagement.LoadSceneMode.Single);
     }
 }

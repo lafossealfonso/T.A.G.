@@ -5,8 +5,11 @@ using Unity.Netcode;
 public class OnlineBasic_PlayerScoreCard : NetworkBehaviour
 {
     [SerializeField] private float fillSpeed = 3f;
+    private float baseFillSpeed;
     [SerializeField] private float drainSpeedMultiplier = 0.3f;
     [SerializeField] private float maxScore = 100f;
+
+
 
     public NetworkVariable<float> scoreValue = new NetworkVariable<float>(
         0f,
@@ -19,6 +22,12 @@ public class OnlineBasic_PlayerScoreCard : NetworkBehaviour
     private void Awake()
     {
         playerData = GetComponent<NetworkedPlayerData>();
+        baseFillSpeed = fillSpeed;
+    }
+    public void ServerResetFillSpeed()
+    {
+        if (!IsServer) return;
+        fillSpeed = baseFillSpeed;
     }
 
     private void FixedUpdate()

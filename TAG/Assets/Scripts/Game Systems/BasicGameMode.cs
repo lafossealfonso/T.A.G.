@@ -41,6 +41,7 @@ public class BasicGameMode : MonoBehaviour
     [SerializeField] TextMeshProUGUI winnerDisplayName;
     [Header("Game Manager Set-Up")]
     [SerializeField] MMF_Player feedbackPlayerTagged;
+    [SerializeField] FinalMenu finalMenu;
     bool gameEnded;
     [SerializeField] bool funnyOn = false;
     [SerializeField] FunnyScript funnyScript;
@@ -61,6 +62,7 @@ public class BasicGameMode : MonoBehaviour
     private void Awake()
     {
         roundScoreFeedbackPlayer.Events.OnComplete.AddListener(RoundSplashEnded);
+        if (roundFadePlayer != null) roundFadePlayer.Events.OnComplete.AddListener(ShowFinalMenu);
     }
 
 
@@ -163,31 +165,12 @@ public class BasicGameMode : MonoBehaviour
     }
 
     //END RESET ROUND LOGIC
-
-    void Update()
+    void ShowFinalMenu()
     {
-        
-        bool spacePressed = UnityEngine.InputSystem.Keyboard.current.spaceKey.wasPressedThisFrame;
-
-        bool controllerPressed =
-            UnityEngine.InputSystem.Gamepad.current != null &&
-            UnityEngine.InputSystem.Gamepad.current.buttonSouth.wasPressedThisFrame;
-
-        if (roundFadeActive == true && (spacePressed || controllerPressed))
-        {
-            //roundReverseFadePlayer.PlayFeedbacks();
-            //roundFadeActive = false;
-        }
-
-        if (gameEnded == false) return;
-
-        if (spacePressed || controllerPressed)
-        {
-            Reload();
-        }
-
-        
+        if (finalMenu != null) finalMenu.Show();
     }
+
+    
 
     public void Reload()
     {
